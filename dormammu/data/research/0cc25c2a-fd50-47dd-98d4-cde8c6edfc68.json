@@ -1,0 +1,87 @@
+{
+  "topic": "진격의거인 에렌이 땅울림을 하지 않았다면 향후 100년",
+  "summary": "The topic explores a hypothetical scenario in the popular manga and anime series 'Attack on Titan' (Shingeki no Kyojin) created by Hajime Isayama, wherein the protagonist, Eren Yeager, does not initiate the 'Rumbling'. The Rumbling is a catastrophic event within the series where Eren unleashes thousands of colossal titans confined within the walls of Paradis Island to trample the world beyond, aiming to secure the survival of his homeland by eliminating external threats. Without Eren's decision to execute the Rumbling, the series' narrative would have followed a drastically different trajectory, focusing on diplomatic efforts, potential peace negotiations, or prolonged conflict with the rest of the world, particularly Marley, the primary antagonist nation. This hypothetical scenario would examine the sociopolitical dynamics and survival strategies of Paradis Island in a world still hostile towards Eldians, the descendants of Ymir who can transform into titans.",
+  "key_characters": [
+    {
+      "name": "Eren Yeager",
+      "role": "Protagonist",
+      "description": "A young man driven by a desire for freedom and the protection of his friends and homeland.",
+      "motivations": "His motivations include securing Paradis Island's safety, avenging his mother's death, and pursuing an ambiguous form of freedom."
+    },
+    {
+      "name": "Mikasa Ackerman",
+      "role": "Eren's closest friend",
+      "description": "A skilled warrior fiercely loyal to Eren and guided by her sense of duty and love for him.",
+      "motivations": "Mikasa is primarily motivated by her desire to protect Eren and her friends, often caught between her duty and personal feelings."
+    },
+    {
+      "name": "Armin Arlert",
+      "role": "Strategist and moral compass",
+      "description": "Eren's childhood friend known for his intelligence and strategic thinking.",
+      "motivations": "Armin seeks peaceful resolutions and is driven by a hope for coexistence between Eldians and the rest of the world."
+    },
+    {
+      "name": "Reiner Braun",
+      "role": "Warrior for Marley",
+      "description": "A conflicted warrior burdened by guilt and loyalty to both his homeland and his friends on Paradis Island.",
+      "motivations": "Reiner is driven by his sense of duty to Marley, his internal conflict over his actions, and his complex relationships with those on Paradis."
+    }
+  ],
+  "key_factions": [
+    {
+      "name": "Paradis Eldians",
+      "stance": "Defensive and isolationist",
+      "goals": "Ensure their own survival and independence from external threats.",
+      "resources": "The Founding Titan's power, military force, and the Walls as defensive structures."
+    },
+    {
+      "name": "Marley",
+      "stance": "Aggressive and expansionist",
+      "goals": "Subjugate Paradis Island, control the power of the titans, and maintain global dominance.",
+      "resources": "Advanced military technology, warrior titans, and international alliances."
+    },
+    {
+      "name": "Yeagerists",
+      "stance": "Radical and nationalist",
+      "goals": "Establish Eldian dominance through military might and the Rumbling.",
+      "resources": "Support from Eren Yeager, significant military force, and popular support within Paradis."
+    }
+  ],
+  "world_setting": "Set in a world where humanity resides within walled cities to protect against gigantic humanoid creatures known as titans. The political landscape is marked by tension between the isolated Paradis Island and the technologically advanced Marley and other nations. Discrimination against Eldians, who can transform into titans, is rampant globally, creating a backdrop of fear, prejudice, and militaristic ambition. The series explores themes of survival, identity, and the cyclical nature of violence amidst a world recovering from endless warfare.",
+  "conflict_structure": "The core conflict revolves around the dichotomy of survival versus morality. Eren’s choice to initiate the Rumbling represents the extreme measures taken to ensure Paradis Island’s survival at immense moral cost. Without the Rumbling, the conflicts would instead focus on diplomatic endeavors, internal political struggles on Paradis Island, and possibly an arms race against Marley. The power dynamics would involve balancing the military might of Marley against the strategic advantages of Paradis, each faction trying to leverage their resources and ideologies to either make peace or wage war.",
+  "historical_context": "The series draws parallels to real-world historical events, such as the Holocaust and the Jewish diaspora, through its depiction of the persecution of Eldians. The theme of a nation’s isolationism and fear of external threats mirrors pre-WWII Japan and its militaristic expansionism. The narrative also echoes Cold War-era tensions, where world powers were engaged in an arms race, and geopolitics were heavily influenced by nuclear deterrence theory, akin to the destructive potential of the titans.",
+  "fan_theories": [
+    "Some fans speculate that without the Rumbling, Paradis might have pursued an alliance with sympathetic factions within Marley or other global powers discontent with Marley's dominance.",
+    "Another theory suggests that Eren's refusal to initiate the Rumbling could lead to a rebellion within Paradis by factions like the Yeagerists, who might view him as a traitor."
+  ],
+  "thematic_elements": [
+    "Power and its abuse",
+    "The nature of freedom and its cost",
+    "Cycle of hatred and revenge",
+    "Identity and the weight of history",
+    "The moral implications of survival tactics"
+  ],
+  "topic_specific_metrics": [
+    {
+      "name": "Diplomatic Evolution",
+      "description": "Assesses the development and success of diplomatic relations between Paradis and other nations in lieu of the Rumbling.",
+      "weight": 0.8
+    },
+    {
+      "name": "Internal Stability",
+      "description": "Measures the political and social stability within Paradis Island without Eren's authoritarian influence.",
+      "weight": 0.7
+    },
+    {
+      "name": "Technological Advancements",
+      "description": "Evaluates the progress and distribution of technological innovations resulting from the absence of war efforts.",
+      "weight": 0.6
+    }
+  ],
+  "sources": [
+    "Attack on Titan manga/anime canon",
+    "Interviews with creator Hajime Isayama",
+    "Fan forums and analysis on platforms like Reddit and YouTube"
+  ],
+  "created_at": "2026-03-21T10:46:11.863102+00:00"
+}

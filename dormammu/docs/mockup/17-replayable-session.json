@@ -1,0 +1,735 @@
+{
+  "$schema": "dormammu-replay-session/v1",
+  "$doc": "Dormammu Replay Session — Best Path 리플레이용 세션 데이터 목업. 프론트엔드 ReplayViewer가 소비하는 단일 JSON.",
+
+  "session": {
+    "id": "sim_aot_erwin_001",
+    "version": "0.3.0-alpha",
+    "topic": "진격의 거인에서 아르민 대신 엘빈을 살렸다면?",
+    "status": "completed",
+    "scale": "macro",
+    "created_at": "2026-03-15T14:22:08Z",
+    "completed_at": "2026-03-15T16:47:33Z",
+    "duration_seconds": 8725,
+    "model": "gpt-4o-2025-08-06",
+    "config": {
+      "max_depth": 10,
+      "node_years": 100,
+      "years_per_turn": 25,
+      "agents_per_node": 5,
+      "cost_limit_usd": 10.0,
+      "expansion_threshold": 0.30,
+      "sf_injection_every_n": 3,
+      "memory_cap": 20
+    },
+    "totals": {
+      "nodes": 100,
+      "pruned_nodes": 23,
+      "leaf_nodes": 9,
+      "total_turns": 580,
+      "total_tokens_in": 892450,
+      "total_tokens_out": 355380,
+      "total_cost_usd": 8.42
+    }
+  },
+
+  "agents": {
+    "A001": {
+      "name": "엘빈 스미스",
+      "role": "주인공 / 전략가",
+      "big5": { "openness": 0.95, "conscientiousness": 0.92, "extraversion": 0.78, "agreeableness": 0.45, "neuroticism": 0.35 },
+      "backstory_summary": "조사병단 13대 단장. 아버지의 가설을 증명하기 위해 평생을 바쳤다. 시가시나 전투에서 팔을 잃고, 리바이의 선택으로 초대형 거인을 계승.",
+      "goals": ["벽 밖 세계의 진실 규명", "파라디 섬의 생존 전략 수립", "마레와의 외교적 해결"],
+      "titan_power": "초대형 거인 (베르톨트 후버에게서 계승)",
+      "alive_at_end": false,
+      "cause_of_death": "유미르의 저주 (계승 후 13년)"
+    },
+    "A002": {
+      "name": "리바이 아커만",
+      "role": "수호자 / 관찰자",
+      "big5": { "openness": 0.40, "conscientiousness": 0.98, "extraversion": 0.25, "agreeableness": 0.30, "neuroticism": 0.20 },
+      "backstory_summary": "인류 최강의 병사. 지하도시 출신. 엘빈에게 충성하며 그의 오른팔 역할. 아르민 대신 엘빈을 살리는 결정을 내림.",
+      "goals": ["엘빈의 보호", "거인 제거", "부하들의 안전"],
+      "titan_power": null,
+      "alive_at_end": true,
+      "cause_of_death": null
+    },
+    "A003": {
+      "name": "한지 조에",
+      "role": "과학자 / 후계자",
+      "big5": { "openness": 0.98, "conscientiousness": 0.70, "extraversion": 0.90, "agreeableness": 0.75, "neuroticism": 0.55 },
+      "backstory_summary": "조사병단 분대장. 거인 연구에 열정적인 과학자. 엘빈 사후 조사병단을 이끌게 됨.",
+      "goals": ["거인 과학 해명", "13년 저주 극복 연구", "엘빈의 유산 계승"],
+      "titan_power": null,
+      "alive_at_end": true,
+      "cause_of_death": null
+    },
+    "A004": {
+      "name": "에렌 예거",
+      "role": "분기점 / 도전자",
+      "big5": { "openness": 0.60, "conscientiousness": 0.55, "extraversion": 0.85, "agreeableness": 0.20, "neuroticism": 0.80 },
+      "backstory_summary": "진격의 거인 + 시조 거인 계승자. 아르민의 죽음 이후 급진화 경향. 엘빈의 영향으로 원작보다 인간적인 선택을 하게 됨.",
+      "goals": ["자유 획득", "엘디아인 해방", "아르민의 꿈(바다) 실현"],
+      "titan_power": "진격의 거인 + 시조 거인",
+      "alive_at_end": false,
+      "cause_of_death": "유미르 해방 과정에서 자발적 희생"
+    },
+    "A005": {
+      "name": "지크 예거",
+      "role": "적대자 / 거울",
+      "big5": { "openness": 0.85, "conscientiousness": 0.88, "extraversion": 0.65, "agreeableness": 0.15, "neuroticism": 0.60 },
+      "backstory_summary": "마레 전사장. 짐승 거인 계승자. 안락사 계획의 주도자. 엘빈과 동급의 전략가로서 대립.",
+      "goals": ["안락사 계획 실현", "엘디아인 '구원'", "아버지에 대한 복수"],
+      "titan_power": "짐승 거인",
+      "alive_at_end": false,
+      "cause_of_death": "엘빈의 외교 전략에 의해 고립, 최종 전투에서 사망"
+    }
+  },
+
+  "best_path": {
+    "path_id": "path-best",
+    "composite_score": 0.93,
+    "ending_type": "비극적 영웅 엔딩",
+    "ending_title": "엘빈의 선물",
+    "core_theme": "자유는 선택이지 목적지가 아니다",
+    "node_ids": ["N001", "N002", "N014", "N036", "N052", "N062", "N072", "N083", "N087", "N100"],
+    "total_turns": 58,
+    "total_years": 862
+  },
+
+  "nodes": [
+    {
+      "node_id": "N001",
+      "depth": 0,
+      "parent_id": null,
+      "title": "엘빈이 초대형 거인을 계승하다",
+      "status": "expanded",
+      "children": ["N002", "N003", "N004"],
+      "is_best_path": true,
+      "hypothesis": "리바이가 아르민 대신 엘빈에게 척수액을 주사. 엘빈이 초대형 거인을 계승하고, 아르민은 사망한다.",
+
+      "scores": {
+        "character_fidelity": 0.92,
+        "fan_resonance": 0.88,
+        "emotional_magnitude": 0.70,
+        "divergence_value": 0.65,
+        "plot_logic": 0.90,
+        "fandom_speculation": 0.85,
+        "composite": 0.83
+      },
+
+      "tokens": {
+        "input": 8420,
+        "output": 3850,
+        "total": 12270,
+        "breakdown": {
+          "hypothesis_generation": { "input": 1200, "output": 680 },
+          "persona_generation": { "input": 1800, "output": 920 },
+          "simulation_turns": { "input": 4220, "output": 1750 },
+          "evaluation": { "input": 1200, "output": 500 }
+        }
+      },
+
+      "cost": {
+        "simulation_usd": 0.053,
+        "evaluation_usd": 0.012,
+        "hypothesis_usd": 0.009,
+        "total_usd": 0.074
+      },
+
+      "timing": {
+        "started_at": "2026-03-15T14:22:08Z",
+        "completed_at": "2026-03-15T14:24:31Z",
+        "duration_seconds": 143
+      },
+
+      "foreshadowing": {
+        "planted": [
+          {
+            "id": "FS-001",
+            "description": "에렌의 진격 거인 미래 기억 플래시 — 바다와 불타는 세계 이미지",
+            "resolved_at": "N072"
+          }
+        ],
+        "resolved": []
+      },
+
+      "inspiration_injection": null,
+
+      "turns": [
+        {
+          "turn_number": 1,
+          "year": 850,
+          "narrative": "시가시나 탈환작전 막바지. 리바이는 주사기를 손에 쥔 채 엘빈과 아르민 사이에서 멈춘다. 에렌의 절규가 벽 위를 울린다. 리바이는 엘빈에게 주사를 놓는다. 아르민의 마지막 숨이 멈추고, 엘빈이 순수 거인으로 변한다.",
+          "events": [
+            {
+              "type": "decision",
+              "agent": "A002",
+              "description": "리바이, 엘빈에게 척수액 주사 결정",
+              "impact": "critical",
+              "emotional_weight": 0.98
+            },
+            {
+              "type": "death",
+              "agent": null,
+              "description": "아르민 알레르트 사망",
+              "impact": "critical",
+              "emotional_weight": 0.95
+            },
+            {
+              "type": "transformation",
+              "agent": "A001",
+              "description": "엘빈, 초대형 거인 계승",
+              "impact": "critical",
+              "emotional_weight": 0.90
+            }
+          ],
+          "agent_actions": {
+            "A001": { "action": "transform", "detail": "무의식 중 '지하실...' 중얼거림 → 순수 거인화 → 베르톨트 섭취", "mood_delta": 0.0, "energy_delta": -0.3 },
+            "A002": { "action": "decide", "detail": "엘빈의 손을 한 번 잡은 뒤 주사를 놓음. 말 없음.", "mood_delta": -0.4, "energy_delta": -0.2 },
+            "A003": { "action": "observe", "detail": "작전 현황 확인 중. 리바이의 선택에 개입하지 않음.", "mood_delta": -0.2, "energy_delta": 0.0 },
+            "A004": { "action": "react", "detail": "아르민의 죽음 목격. 주먹을 쥐지만 아무 말도 하지 않음. 진격 거인 미래 기억 플래시.", "mood_delta": -0.6, "energy_delta": -0.3 },
+            "A005": { "action": "retreat", "detail": "시가시나에서 퇴각. 파라디 측 초대형 거인 교체 미인지.", "mood_delta": 0.0, "energy_delta": 0.1 }
+          },
+          "world_state_snapshot": {
+            "agents": {
+              "A001": { "mood": 0.3, "energy": 0.4, "alive": true, "location": "시가시나 벽 위" },
+              "A002": { "mood": 0.2, "energy": 0.6, "alive": true, "location": "시가시나 벽 위" },
+              "A003": { "mood": 0.4, "energy": 0.5, "alive": true, "location": "시가시나 외곽" },
+              "A004": { "mood": 0.1, "energy": 0.3, "alive": true, "location": "시가시나 벽 위" },
+              "A005": { "mood": 0.5, "energy": 0.7, "alive": true, "location": "마레 귀환 중" }
+            },
+            "relationships": {
+              "A001→A002": { "value": 0.92, "label": "trust" },
+              "A002→A001": { "value": 0.88, "label": "protection" },
+              "A001→A004": { "value": 0.45, "label": "interest" },
+              "A004→A001": { "value": 0.30, "label": "respect" },
+              "A001→A003": { "value": 0.85, "label": "trust" },
+              "A001→A005": { "value": 0.10, "label": "caution" }
+            },
+            "resources": {
+              "titan_powers_held": ["colossal", "attack", "founding"],
+              "military_strength": 0.35,
+              "diplomatic_channels": 0,
+              "public_morale": 0.40
+            },
+            "global_flags": {
+              "basement_discovered": false,
+              "mare_contact": false,
+              "curse_known": false,
+              "erwin_public_speech": false
+            }
+          },
+          "cost_usd": 0.018,
+          "tokens": { "input": 2100, "output": 960 }
+        },
+        {
+          "turn_number": 2,
+          "year": 850,
+          "narrative": "엘빈이 깨어난다. 거인의 치유력으로 복부 관통상은 아물었지만 왼팔은 돌아오지 않았다. 에렌의 얼굴에서 아르민의 부재를 읽는다. 묻지 않는다.",
+          "events": [
+            {
+              "type": "recovery",
+              "agent": "A001",
+              "description": "엘빈, 거인 치유력으로 의식 회복. 좌완 결손 유지.",
+              "impact": "major",
+              "emotional_weight": 0.70
+            }
+          ],
+          "agent_actions": {
+            "A001": { "action": "awaken", "detail": "의식 회복. 에렌의 얼굴에서 아르민 부재를 읽음. '지하실로 가야 한다.'", "mood_delta": 0.1, "energy_delta": 0.3 },
+            "A002": { "action": "guard", "detail": "엘빈 병실 앞에서 경비. 면회 제한.", "mood_delta": 0.1, "energy_delta": 0.0 },
+            "A003": { "action": "research", "detail": "엘빈 상태 모니터링. 거인 치유 속도 기록.", "mood_delta": 0.1, "energy_delta": -0.1 },
+            "A004": { "action": "withdraw", "detail": "병실 방문 후 즉시 퇴장. 감정 표출 없음.", "mood_delta": -0.1, "energy_delta": 0.0 },
+            "A005": { "action": "intel", "detail": "마레 귀환. 파라디 작전 결과 보고 준비.", "mood_delta": 0.0, "energy_delta": 0.2 }
+          },
+          "world_state_snapshot": {
+            "agents": {
+              "A001": { "mood": 0.4, "energy": 0.7, "alive": true, "location": "시가시나 병영" },
+              "A002": { "mood": 0.3, "energy": 0.6, "alive": true, "location": "시가시나 병영" },
+              "A003": { "mood": 0.5, "energy": 0.4, "alive": true, "location": "시가시나 병영" },
+              "A004": { "mood": 0.15, "energy": 0.3, "alive": true, "location": "시가시나 병영" },
+              "A005": { "mood": 0.5, "energy": 0.8, "alive": true, "location": "마레 본국" }
+            },
+            "relationships": {
+              "A001→A002": { "value": 0.92, "label": "trust" },
+              "A002→A001": { "value": 0.89, "label": "protection" },
+              "A001→A004": { "value": 0.47, "label": "interest" },
+              "A004→A001": { "value": 0.28, "label": "ambivalence" },
+              "A001→A003": { "value": 0.85, "label": "trust" },
+              "A001→A005": { "value": 0.10, "label": "caution" }
+            },
+            "resources": {
+              "titan_powers_held": ["colossal", "attack", "founding"],
+              "military_strength": 0.35,
+              "diplomatic_channels": 0,
+              "public_morale": 0.42
+            },
+            "global_flags": {
+              "basement_discovered": false,
+              "mare_contact": false,
+              "curse_known": false,
+              "erwin_public_speech": false
+            }
+          },
+          "cost_usd": 0.016,
+          "tokens": { "input": 1980, "output": 880 }
+        },
+        {
+          "turn_number": 3,
+          "year": 850,
+          "narrative": "지하실. 그리샤 예거의 일지. 벽 밖의 세계. 마레. 엘디아. 거인의 기원. 엘빈은 한 장 한 장 넘기며 세계가 넓어지고 자신이 작아지는 것을 느낀다. '아버지가 옳았군.' 그것뿐이었다.",
+          "events": [
+            {
+              "type": "discovery",
+              "agent": "A001",
+              "description": "엘빈, 그리샤 일지를 통해 벽 밖 세계 최초 인지. 평생의 목표 달성.",
+              "impact": "critical",
+              "emotional_weight": 0.97
+            },
+            {
+              "type": "insight",
+              "agent": "A001",
+              "description": "'진격의 거인 계승자는 후계자의 미래 기억을 볼 수 있다' 문장에 손가락을 짚음",
+              "impact": "major",
+              "emotional_weight": 0.60
+            }
+          ],
+          "agent_actions": {
+            "A001": { "action": "discover", "detail": "일지 전체 통독. '아버지가 옳았군.' 무성의 눈물. 즉시 전략 모드 전환 — 일지 세 부 복사 지시.", "mood_delta": 0.3, "energy_delta": -0.2 },
+            "A002": { "action": "observe", "detail": "지하실 구석에서 엘빈의 표정을 읽음. 반응 없음.", "mood_delta": 0.0, "energy_delta": 0.0 },
+            "A003": { "action": "analyze", "detail": "사진과 문서 분류. 기술 분석 착수. 흥분 상태.", "mood_delta": 0.4, "energy_delta": -0.2 },
+            "A004": { "action": "absorb", "detail": "정보 수용하나 감정적 처리 불가. 아르민 상실이 아직 가시지 않음.", "mood_delta": -0.1, "energy_delta": -0.1 },
+            "A005": { "action": "plan", "detail": "마레 군부에 파라디 작전 결과 보고. '엘빈 스미스... 흥미롭군.'", "mood_delta": 0.1, "energy_delta": 0.0 }
+          },
+          "world_state_snapshot": {
+            "agents": {
+              "A001": { "mood": 0.7, "energy": 0.5, "alive": true, "location": "그리샤의 지하실" },
+              "A002": { "mood": 0.3, "energy": 0.6, "alive": true, "location": "그리샤의 지하실" },
+              "A003": { "mood": 0.9, "energy": 0.3, "alive": true, "location": "그리샤의 지하실" },
+              "A004": { "mood": 0.2, "energy": 0.25, "alive": true, "location": "그리샤의 지하실" },
+              "A005": { "mood": 0.6, "energy": 0.8, "alive": true, "location": "마레 전사대 사령부" }
+            },
+            "relationships": {
+              "A001→A002": { "value": 0.93, "label": "trust" },
+              "A002→A001": { "value": 0.90, "label": "protection" },
+              "A001→A004": { "value": 0.50, "label": "interest" },
+              "A004→A001": { "value": 0.32, "label": "emerging_respect" },
+              "A001→A003": { "value": 0.87, "label": "trust" },
+              "A001→A005": { "value": 0.12, "label": "caution" }
+            },
+            "resources": {
+              "titan_powers_held": ["colossal", "attack", "founding"],
+              "military_strength": 0.35,
+              "diplomatic_channels": 0,
+              "public_morale": 0.45
+            },
+            "global_flags": {
+              "basement_discovered": true,
+              "mare_contact": false,
+              "curse_known": false,
+              "erwin_public_speech": false
+            }
+          },
+          "cost_usd": 0.019,
+          "tokens": { "input": 2140, "output": 1010 }
+        },
+        {
+          "turn_number": 4,
+          "year": 851,
+          "narrative": "한지가 유미르의 저주를 고백한다. 13년. 이미 1년이 지났으니 12년. 엘빈은 찻잔을 내려놓고 빈 종이를 꺼내 12년치 계획을 한 줄 한 줄 채운다. 리바이는 차를 마시며 지켜본다. 종이 맨 아래에 '후계 — ?' 물음표 하나.",
+          "events": [
+            {
+              "type": "revelation",
+              "agent": "A003",
+              "description": "한지, 유미르의 저주(13년 수명) 엘빈에게 고백",
+              "impact": "critical",
+              "emotional_weight": 0.92
+            },
+            {
+              "type": "plan",
+              "agent": "A001",
+              "description": "엘빈, 12년 전략 로드맵 작성 개시",
+              "impact": "major",
+              "emotional_weight": 0.75
+            }
+          ],
+          "agent_actions": {
+            "A001": { "action": "plan", "detail": "12년 역산 계획 작성. '12년이면 충분하다. 충분히 해야 한다.' 감정을 계획으로 변환.", "mood_delta": 0.1, "energy_delta": -0.1 },
+            "A002": { "action": "support", "detail": "찻잔에 차를 반 모금만큼 더 따름. 구석 의자에 앉음. 말 대신 행동, 동정 대신 존재.", "mood_delta": -0.2, "energy_delta": 0.0 },
+            "A003": { "action": "report", "detail": "유미르의 저주 연구 결과 보고. '13년 저주를 깰 방법이 있을 수도 있어.'", "mood_delta": -0.3, "energy_delta": -0.1 },
+            "A004": { "action": "train", "detail": "단독 훈련. 아르민의 세계 지도를 꺼내 바다를 바라봄.", "mood_delta": -0.1, "energy_delta": 0.1 },
+            "A005": { "action": "strategize", "detail": "엘빈 생존 정보 입수. 안락사 계획 수정 검토 시작.", "mood_delta": 0.0, "energy_delta": 0.0 }
+          },
+          "world_state_snapshot": {
+            "agents": {
+              "A001": { "mood": 0.6, "energy": 0.5, "alive": true, "location": "조사병단 사령부" },
+              "A002": { "mood": 0.25, "energy": 0.6, "alive": true, "location": "조사병단 사령부" },
+              "A003": { "mood": 0.5, "energy": 0.4, "alive": true, "location": "조사병단 사령부" },
+              "A004": { "mood": 0.2, "energy": 0.5, "alive": true, "location": "훈련장" },
+              "A005": { "mood": 0.6, "energy": 0.8, "alive": true, "location": "마레 본국" }
+            },
+            "relationships": {
+              "A001→A002": { "value": 0.94, "label": "trust" },
+              "A002→A001": { "value": 0.91, "label": "protection" },
+              "A001→A004": { "value": 0.52, "label": "concern" },
+              "A004→A001": { "value": 0.35, "label": "emerging_respect" },
+              "A001→A003": { "value": 0.88, "label": "trust" },
+              "A001→A005": { "value": 0.15, "label": "strategic_interest" }
+            },
+            "resources": {
+              "titan_powers_held": ["colossal", "attack", "founding"],
+              "military_strength": 0.40,
+              "diplomatic_channels": 0,
+              "public_morale": 0.50
+            },
+            "global_flags": {
+              "basement_discovered": true,
+              "mare_contact": false,
+              "curse_known": true,
+              "erwin_public_speech": false
+            }
+          },
+          "cost_usd": 0.021,
+          "tokens": { "input": 2200, "output": 1000 }
+        }
+      ],
+
+      "$turns_note": "위 4턴은 N001의 상세 목업. 나머지 노드(N002~N100)도 동일 구조로 turns 배열을 갖는다. 전체 Best Path 58턴의 완전한 데이터는 실제 시뮬레이션 실행 시 생성됨."
+    },
+
+    {
+      "node_id": "N002",
+      "depth": 1,
+      "parent_id": "N001",
+      "title": "지하실의 진실 — 엘빈의 꿈이 이루어지다",
+      "status": "expanded",
+      "children": ["N005", "N006"],
+      "is_best_path": true,
+      "hypothesis": "엘빈이 그리샤 일지를 통해 벽 밖 세계를 인지. 목표 달성 후 공허와 새로운 사명 사이에서 '다음 목표는 세계다'로 전환.",
+      "scores": { "character_fidelity": 0.90, "fan_resonance": 0.85, "emotional_magnitude": 0.72, "divergence_value": 0.60, "plot_logic": 0.88, "fandom_speculation": 0.90, "composite": 0.82 },
+      "tokens": { "input": 9130, "output": 4220, "total": 13350 },
+      "cost": { "simulation_usd": 0.058, "evaluation_usd": 0.012, "hypothesis_usd": 0.009, "total_usd": 0.079 },
+      "timing": { "started_at": "2026-03-15T14:24:32Z", "completed_at": "2026-03-15T14:27:18Z", "duration_seconds": 166 },
+      "foreshadowing": {
+        "planted": [{ "id": "FS-002", "description": "진격의 거인 계승자는 후계자의 미래 기억을 본다 — 엘빈의 추론 시작", "resolved_at": "N087" }],
+        "resolved": []
+      },
+      "inspiration_injection": null,
+      "turns": [],
+      "$turns_note": "N001과 동일 구조. 4턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N014",
+      "depth": 2,
+      "parent_id": "N002",
+      "title": "엘빈의 재건 선언 — '다음 목표는 세계다'",
+      "status": "expanded",
+      "children": ["N032", "N033"],
+      "is_best_path": true,
+      "hypothesis": "엘빈이 파라디 섬의 재건과 대외 전략을 동시 추진. 에렌과의 첫 갈등이 표면화.",
+      "scores": { "character_fidelity": 0.88, "fan_resonance": 0.82, "emotional_magnitude": 0.75, "divergence_value": 0.70, "plot_logic": 0.86, "fandom_speculation": 0.82, "composite": 0.81 },
+      "tokens": { "input": 10840, "output": 4680, "total": 15520 },
+      "cost": { "simulation_usd": 0.068, "evaluation_usd": 0.013, "hypothesis_usd": 0.010, "total_usd": 0.091 },
+      "timing": { "started_at": "2026-03-15T14:27:19Z", "completed_at": "2026-03-15T14:31:02Z", "duration_seconds": 223 },
+      "foreshadowing": {
+        "planted": [{ "id": "FS-003", "description": "엘빈의 자기 고백 '오직 나 자신의 꿈만을 위해 싸워왔다'", "resolved_at": "N083" }],
+        "resolved": []
+      },
+      "inspiration_injection": null,
+      "turns": [],
+      "$turns_note": "5턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N036",
+      "depth": 3,
+      "parent_id": "N014",
+      "title": "엘빈, 초대형 거인의 규모를 실감하다",
+      "status": "expanded",
+      "children": ["N048", "N049"],
+      "is_best_path": true,
+      "hypothesis": "초대형 거인 변신 훈련. 베르톨트의 기억 수신. 마레 첩보로 즉시 전환.",
+      "scores": { "character_fidelity": 0.86, "fan_resonance": 0.80, "emotional_magnitude": 0.78, "divergence_value": 0.72, "plot_logic": 0.85, "fandom_speculation": 0.80, "composite": 0.80 },
+      "tokens": { "input": 11250, "output": 5120, "total": 16370 },
+      "cost": { "simulation_usd": 0.072, "evaluation_usd": 0.013, "hypothesis_usd": 0.010, "total_usd": 0.095 },
+      "timing": { "started_at": "2026-03-15T14:31:03Z", "completed_at": "2026-03-15T14:35:20Z", "duration_seconds": 257 },
+      "foreshadowing": { "planted": [], "resolved": [] },
+      "inspiration_injection": { "source": "아시모프 — 파운데이션", "seed": "셀던 계획: 멸망을 막을 수 없지만 기간을 단축할 수 있다", "influence": "엘빈의 12년 계획이 셀던 계획과 구조적 유사성을 갖도록 유도" },
+      "turns": [],
+      "$turns_note": "5턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N052",
+      "depth": 4,
+      "parent_id": "N036",
+      "title": "마레 접촉 — 엘빈의 외교 포석",
+      "status": "expanded",
+      "children": ["N060", "N061"],
+      "is_best_path": true,
+      "hypothesis": "엘빈이 마레 개혁파와의 비공식 접촉을 시도. 외교라는 새로운 전쟁터.",
+      "scores": { "character_fidelity": 0.85, "fan_resonance": 0.83, "emotional_magnitude": 0.80, "divergence_value": 0.75, "plot_logic": 0.87, "fandom_speculation": 0.83, "composite": 0.82 },
+      "tokens": { "input": 12680, "output": 5540, "total": 18220 },
+      "cost": { "simulation_usd": 0.081, "evaluation_usd": 0.014, "hypothesis_usd": 0.011, "total_usd": 0.106 },
+      "timing": { "started_at": "2026-03-15T14:35:21Z", "completed_at": "2026-03-15T14:40:55Z", "duration_seconds": 334 },
+      "foreshadowing": { "planted": [], "resolved": [] },
+      "inspiration_injection": null,
+      "turns": [],
+      "$turns_note": "6턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N062",
+      "depth": 5,
+      "parent_id": "N052",
+      "title": "지크와 엘빈, 비밀 회담",
+      "status": "expanded",
+      "children": ["N071", "N072"],
+      "is_best_path": true,
+      "hypothesis": "안개 낀 항구에서 두 전략가가 처음 만남. 안락사 계획 논의. 엘빈이 지크의 약점(아버지 콤플렉스)을 간파.",
+      "scores": { "character_fidelity": 0.87, "fan_resonance": 0.86, "emotional_magnitude": 0.85, "divergence_value": 0.70, "plot_logic": 0.88, "fandom_speculation": 0.85, "composite": 0.84 },
+      "tokens": { "input": 13450, "output": 5890, "total": 19340 },
+      "cost": { "simulation_usd": 0.086, "evaluation_usd": 0.014, "hypothesis_usd": 0.011, "total_usd": 0.111 },
+      "timing": { "started_at": "2026-03-15T14:40:56Z", "completed_at": "2026-03-15T14:47:12Z", "duration_seconds": 376 },
+      "foreshadowing": {
+        "planted": [{ "id": "FS-004", "description": "지크의 무의식적 손가락 깨물기 — 거인화 트리거와 같은 부위", "resolved_at": "N100" }],
+        "resolved": []
+      },
+      "inspiration_injection": { "source": "르 카레 — 추운 나라에서 온 스파이", "seed": "이중 스파이의 진짜 충성은 자기 자신에게도 숨겨져 있다", "influence": "지크의 자기기만 묘사 심화" },
+      "turns": [],
+      "$turns_note": "6턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N072",
+      "depth": 7,
+      "parent_id": "N062",
+      "title": "엘빈의 13년 계산",
+      "status": "expanded",
+      "children": ["N083", "N084"],
+      "is_best_path": true,
+      "hypothesis": "계승 7년차. 남은 시간 6년. 엘빈이 자신의 사망 시점을 역산하여 냉혹한 최종 계획을 세움.",
+      "scores": { "character_fidelity": 0.88, "fan_resonance": 0.85, "emotional_magnitude": 0.90, "divergence_value": 0.68, "plot_logic": 0.87, "fandom_speculation": 0.80, "composite": 0.84 },
+      "tokens": { "input": 14220, "output": 6350, "total": 20570 },
+      "cost": { "simulation_usd": 0.092, "evaluation_usd": 0.015, "hypothesis_usd": 0.012, "total_usd": 0.119 },
+      "timing": { "started_at": "2026-03-15T15:12:30Z", "completed_at": "2026-03-15T15:19:45Z", "duration_seconds": 435 },
+      "foreshadowing": {
+        "planted": [{ "id": "FS-005", "description": "리바이의 숙주 보호 본능 — 엘빈의 죽음 시점을 처음으로 직시", "resolved_at": "N100" }],
+        "resolved": [{ "id": "FS-001", "description": "에렌의 미래 기억 분기 감지 → 엘빈이 에렌의 능력을 전략적으로 고려", "planted_at": "N001" }]
+      },
+      "inspiration_injection": null,
+      "turns": [],
+      "$turns_note": "6턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N083",
+      "depth": 8,
+      "parent_id": "N072",
+      "title": "엘빈의 최후 연설",
+      "status": "expanded",
+      "children": ["N087", "N100"],
+      "is_best_path": true,
+      "hypothesis": "죽음 1년 전. 엘빈이 파라디 전군과 마레 협상단 앞에서 마지막 연설. '마음을 바칩니다'가 한 인간의 총결산이 되는 순간.",
+      "scores": { "character_fidelity": 0.90, "fan_resonance": 0.95, "emotional_magnitude": 0.97, "divergence_value": 0.72, "plot_logic": 0.90, "fandom_speculation": 0.95, "composite": 0.91 },
+      "tokens": { "input": 15870, "output": 7120, "total": 22990 },
+      "cost": { "simulation_usd": 0.104, "evaluation_usd": 0.016, "hypothesis_usd": 0.012, "total_usd": 0.132 },
+      "timing": { "started_at": "2026-03-15T15:19:46Z", "completed_at": "2026-03-15T15:28:33Z", "duration_seconds": 527 },
+      "foreshadowing": {
+        "planted": [],
+        "resolved": [{ "id": "FS-003", "description": "엘빈의 자기 고백이 최후 연설에서 두 자아(꿈의 사내 + 사령관)로 통합", "planted_at": "N014" }]
+      },
+      "inspiration_injection": { "source": "셰익스피어 — 헨리 5세", "seed": "아쟁쿠르 연설: 왕이 병사와 같은 존재임을 선언하는 순간", "influence": "엘빈이 사령관이 아닌 한 인간으로서 연설하는 톤" },
+      "turns": [],
+      "$turns_note": "7턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N087",
+      "depth": 9,
+      "parent_id": "N083",
+      "title": "엘빈과 에렌, 마지막 대화",
+      "status": "completed",
+      "children": [],
+      "is_best_path": true,
+      "hypothesis": "죽음 6개월 전. 엘빈이 에렌을 단둘이 불러 마지막으로 완전히 솔직한 대화. '당신이 내 마지막 도박이다.'",
+      "scores": { "character_fidelity": 0.88, "fan_resonance": 0.95, "emotional_magnitude": 0.96, "divergence_value": 0.80, "plot_logic": 0.88, "fandom_speculation": 0.95, "composite": 0.91 },
+      "tokens": { "input": 16340, "output": 7450, "total": 23790 },
+      "cost": { "simulation_usd": 0.108, "evaluation_usd": 0.016, "hypothesis_usd": 0.013, "total_usd": 0.137 },
+      "timing": { "started_at": "2026-03-15T15:28:34Z", "completed_at": "2026-03-15T15:38:20Z", "duration_seconds": 586 },
+      "foreshadowing": {
+        "planted": [],
+        "resolved": [{ "id": "FS-002", "description": "진격의 거인 미래 기억 이해 → 엘빈-에렌 관계가 도구→인간으로 전환", "planted_at": "N002" }]
+      },
+      "inspiration_injection": null,
+      "turns": [],
+      "$turns_note": "7턴, 에이전트 5명."
+    },
+
+    {
+      "node_id": "N100",
+      "depth": 10,
+      "parent_id": "N083",
+      "title": "엘빈의 선물",
+      "status": "leaf",
+      "children": [],
+      "is_best_path": true,
+      "hypothesis": "엘빈 사망 전날 밤, 세 통의 편지. 한지에게는 전략, 에렌에게는 자유, 리바이에게는 감사. 이 편지가 이후 20년의 역사를 바꾼다.",
+      "scores": { "character_fidelity": 0.90, "fan_resonance": 0.97, "emotional_magnitude": 0.97, "divergence_value": 0.82, "plot_logic": 0.92, "fandom_speculation": 0.97, "composite": 0.93 },
+      "tokens": { "input": 17280, "output": 7940, "total": 25220 },
+      "cost": { "simulation_usd": 0.116, "evaluation_usd": 0.017, "hypothesis_usd": 0.013, "total_usd": 0.146 },
+      "timing": { "started_at": "2026-03-15T15:38:21Z", "completed_at": "2026-03-15T15:49:08Z", "duration_seconds": 647 },
+      "foreshadowing": {
+        "planted": [],
+        "resolved": [
+          { "id": "FS-004", "description": "지크의 자기기만 → 편지에서 에렌의 자유의지론에 반영", "planted_at": "N062" },
+          { "id": "FS-005", "description": "리바이의 숙주 보호 → 80세 리바이 에필로그 '그가 살아있었으니까 이렇게 된 거야'", "planted_at": "N072" }
+        ]
+      },
+      "inspiration_injection": null,
+      "turns": [],
+      "$turns_note": "8턴, 에이전트 5명. 최종 leaf 노드."
+    }
+  ],
+
+  "deepen": {
+    "path_id": "path-best",
+    "total_chapters": 8,
+    "total_chars_kr": 10500,
+    "total_words_kr": 4200,
+    "tokens": { "input": 41500, "output": 19500, "total": 61000 },
+    "cost_usd": 0.30,
+    "chapters": [
+      {
+        "index": 0,
+        "title": "프롤로그 — \"주사기\"",
+        "source_node": "N001",
+        "chars_kr": 1200,
+        "tokens": { "input": 4820, "output": 2180, "total": 7000 },
+        "pov_agent": "A002",
+        "key_quote": "선택은 끝났다. 후회는 아직 시작되지 않았다.",
+        "emotional_peak": 0.98
+      },
+      {
+        "index": 1,
+        "title": "챕터 1 — \"지하실\"",
+        "source_node": "N002",
+        "chars_kr": 1400,
+        "tokens": { "input": 5340, "output": 2530, "total": 7870 },
+        "pov_agent": "A001",
+        "key_quote": "아버지가 옳았군.",
+        "emotional_peak": 0.97
+      },
+      {
+        "index": 2,
+        "title": "챕터 2 — \"13년의 모래시계\"",
+        "source_node": "N072",
+        "chars_kr": 1300,
+        "tokens": { "input": 5120, "output": 2380, "total": 7500 },
+        "pov_agent": "A001",
+        "key_quote": "12년이면 충분하다. 충분히 해야 한다.",
+        "emotional_peak": 0.92
+      },
+      {
+        "index": 3,
+        "title": "챕터 3 — \"두 전략가\"",
+        "source_node": "N062",
+        "chars_kr": 1500,
+        "tokens": { "input": 5680, "output": 2710, "total": 8390 },
+        "pov_agent": "A001",
+        "key_quote": "위험한 사람이야. 자기 자신에게 거짓말을 하고 있으니까.",
+        "emotional_peak": 0.88
+      },
+      {
+        "index": 4,
+        "title": "챕터 4 — \"최후의 연설\"",
+        "source_node": "N083",
+        "chars_kr": 1400,
+        "tokens": { "input": 5450, "output": 2620, "total": 8070 },
+        "pov_agent": "A001",
+        "key_quote": "마레와 싸우지 마십시오. 마레와 살아가십시오.",
+        "emotional_peak": 0.95
+      },
+      {
+        "index": 5,
+        "title": "챕터 5 — \"자유란 무엇인가\"",
+        "source_node": "N087",
+        "chars_kr": 1200,
+        "tokens": { "input": 4980, "output": 2340, "total": 7320 },
+        "pov_agent": "A004",
+        "key_quote": "선택할 수 있다는 것. 무엇을 위해 살고, 무엇을 위해 죽을지를.",
+        "emotional_peak": 0.96
+      },
+      {
+        "index": 6,
+        "title": "챕터 6 — \"편지\"",
+        "source_node": "N100",
+        "chars_kr": 1500,
+        "tokens": { "input": 5890, "output": 2780, "total": 8670 },
+        "pov_agent": "A001",
+        "key_quote": "차 한 잔 마시며 쉬어도 된다.",
+        "emotional_peak": 0.99
+      },
+      {
+        "index": 7,
+        "title": "에필로그 — \"80세의 리바이\"",
+        "source_node": "N100",
+        "chars_kr": 1000,
+        "tokens": { "input": 4220, "output": 1960, "total": 6180 },
+        "pov_agent": "A002",
+        "key_quote": "…그가 살아있었으니까 이렇게 된 거야.",
+        "emotional_peak": 0.94
+      }
+    ]
+  },
+
+  "replay_control": {
+    "total_keyframes": 58,
+    "playback_speeds": [0.5, 1.0, 2.0, 5.0],
+    "default_speed": 1.0,
+    "auto_pause_on": ["critical_event", "node_transition", "death", "foreshadowing_resolve"],
+
+    "highlights": [
+      { "turn": 1, "node": "N001", "label": "리바이의 선택", "type": "critical_event", "emotional_peak": 0.98 },
+      { "turn": 3, "node": "N001", "label": "지하실의 진실", "type": "critical_event", "emotional_peak": 0.97 },
+      { "turn": 4, "node": "N001", "label": "유미르의 저주 인지", "type": "revelation", "emotional_peak": 0.92 },
+      { "turn": 18, "node": "N036", "label": "베르톨트 기억 수신", "type": "discovery", "emotional_peak": 0.85 },
+      { "turn": 28, "node": "N062", "label": "지크와 첫 만남", "type": "confrontation", "emotional_peak": 0.88 },
+      { "turn": 38, "node": "N072", "label": "남은 6년 선언", "type": "revelation", "emotional_peak": 0.90 },
+      { "turn": 45, "node": "N083", "label": "최후의 연설", "type": "climax", "emotional_peak": 0.95 },
+      { "turn": 52, "node": "N087", "label": "에렌과 마지막 대화", "type": "emotional_peak", "emotional_peak": 0.96 },
+      { "turn": 56, "node": "N100", "label": "세 통의 편지", "type": "climax", "emotional_peak": 0.99 },
+      { "turn": 58, "node": "N100", "label": "80세의 리바이", "type": "epilogue", "emotional_peak": 0.94 }
+    ],
+
+    "node_transitions": [
+      { "from_turn": 4, "to_turn": 5, "from_node": "N001", "to_node": "N002" },
+      { "from_turn": 8, "to_turn": 9, "from_node": "N002", "to_node": "N014" },
+      { "from_turn": 13, "to_turn": 14, "from_node": "N014", "to_node": "N036" },
+      { "from_turn": 18, "to_turn": 19, "from_node": "N036", "to_node": "N052" },
+      { "from_turn": 24, "to_turn": 25, "from_node": "N052", "to_node": "N062" },
+      { "from_turn": 30, "to_turn": 31, "from_node": "N062", "to_node": "N072" },
+      { "from_turn": 36, "to_turn": 37, "from_node": "N072", "to_node": "N083" },
+      { "from_turn": 43, "to_turn": 44, "from_node": "N083", "to_node": "N087" },
+      { "from_turn": 50, "to_turn": 51, "from_node": "N087", "to_node": "N100" }
+    ],
+
+    "emotional_curve": {
+      "$doc": "턴별 감정 강도 (0.0~1.0). 프론트엔드 타임라인 바의 색상 매핑에 사용.",
+      "values": [
+        0.98, 0.70, 0.97, 0.92,
+        0.75, 0.78, 0.72, 0.80,
+        0.68, 0.72, 0.75, 0.70, 0.78,
+        0.72, 0.75, 0.80, 0.78, 0.85,
+        0.78, 0.80, 0.82, 0.85, 0.80, 0.83,
+        0.82, 0.85, 0.88, 0.85, 0.87, 0.88,
+        0.85, 0.87, 0.88, 0.90, 0.87, 0.90,
+        0.90, 0.92, 0.93, 0.95, 0.93, 0.94, 0.95,
+        0.92, 0.94, 0.95, 0.96, 0.94, 0.95, 0.96,
+        0.95, 0.96, 0.97, 0.98, 0.97, 0.99, 0.97, 0.94
+      ]
+    }
+  }
+}

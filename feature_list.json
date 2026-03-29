@@ -1,0 +1,80 @@
+[
+  {
+    "id": "F001",
+    "title": "Breadcrumb Trail in Story View",
+    "description": "Show navigation path from root node to selected node with composite scores.",
+    "priority": 1,
+    "status": "in_progress",
+    "module": "frontend/src/components/StoryView.tsx",
+    "acceptance": "✓ Path shown at top | ✓ Clickable nodes | ✓ Scores displayed | ✓ Mobile-responsive"
+  },
+  {
+    "id": "F002",
+    "title": "Display Quality Scores on Tree Nodes",
+    "description": "Show emergence, narrative, diversity, novelty scores on hover.",
+    "priority": 2,
+    "status": "completed",
+    "module": "frontend/src/components/DecisionTree.tsx",
+    "acceptance": "✓ Hover tooltip with all 4 scores | ✓ Color-coded by quality | ✓ Expand threshold indicator",
+    "completed_at": "2026-03-22",
+    "notes": "DB persistence added (hypotheses table) + evaluation scores now saved + API returns scores + tooltip displays with progress bars + emoji icons"
+  },
+  {
+    "id": "F003",
+    "title": "Node Expand/Collapse Toggle",
+    "description": "Add collapse/expand arrows to hide/show subtrees for deep trees.",
+    "priority": 3,
+    "status": "completed",
+    "module": "frontend/src/components/DecisionTree.tsx",
+    "acceptance": "✓ Expand/collapse arrows | ✓ Default: depth≤2 expanded | ✓ Smooth layout recalc | ✓ Depth 20+ performant",
+    "completed_at": "2026-03-22",
+    "notes": "Expand/collapse arrows on nodes with children | Layout algorithm respects collapsed state | Default: depth ≤2 expanded, depth >2 collapsed | Performance: only visible nodes calculated in layout"
+  },
+  {
+    "id": "F004",
+    "title": "Branch Comparison View (Side-by-Side)",
+    "description": "Select two nodes and view narratives, scores, differences side-by-side.",
+    "priority": 4,
+    "status": "completed",
+    "module": "frontend/src/components/BranchComparison.tsx",
+    "acceptance": "✓ Right-click compare | ✓ Side-by-side layout | ✓ Score delta highlighted",
+    "completed_at": "2026-03-22",
+    "notes": "Right-click on node → 'Compare with...' → select second node → modal shows side-by-side comparison with score deltas highlighted (▲ for better, ▼ for worse)"
+  },
+  {
+    "id": "F005",
+    "title": "WebSocket Live Updates",
+    "description": "Stream new turns to frontend in real-time during simulation.",
+    "priority": 5,
+    "status": "pending",
+    "module": "api/routes.py, useSimulation.ts",
+    "acceptance": "✓ WebSocket endpoint | ✓ Auto-scroll to latest | ✓ Graceful reconnection"
+  },
+  {
+    "id": "F006",
+    "title": "Mobile Responsive Layout",
+    "description": "Adapt StoryView for mobile/tablet: tabs instead of fixed sidebar.",
+    "priority": 6,
+    "status": "pending",
+    "module": "frontend/src/components/StoryView.tsx",
+    "acceptance": "✓ Desktop: side-by-side | ✓ Mobile: tabbed | ✓ No horizontal scroll"
+  },
+  {
+    "id": "F007",
+    "title": "Linear Read Mode (Loom-Inspired)",
+    "description": "Alternative view: continuous narrative reading without tree UI.",
+    "priority": 7,
+    "status": "pending",
+    "module": "frontend/src/components/ReadMode.tsx",
+    "acceptance": "✓ Toggle 'Tree' ↔ 'Read' | ✓ Continuous narrative | ✓ Timeline scrubber | ✓ Export as text/PDF"
+  },
+  {
+    "id": "F008",
+    "title": "Rewind & Replay (Retry Pattern)",
+    "description": "Restart simulation at node N with variation. Exploratory what-if analysis.",
+    "priority": 8,
+    "status": "pending",
+    "module": "orchestrator/loop.py, api/routes.py",
+    "acceptance": "✓ 'Restart from Here' option | ✓ Cost warning | ✓ Visual distinction | ✓ Variation seed"
+  }
+]

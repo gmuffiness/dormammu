@@ -1,0 +1,292 @@
+{
+  "_comment": "Dormammu v2 — 2-Phase Architecture: Setup (tree skeleton) → Execution (simulate selected nodes)",
+
+  "simulation": {
+    "id": "mock-v2",
+    "topic": "진격의거인 에렌이 땅울림을 하지 않았다면 향후 100년",
+    "language": "ko",
+    "max_depth": 3,
+    "status": "setup_complete",
+    "phase": "setup_complete",
+    "total_cost_usd": 0.15,
+    "setup_cost_usd": 0.15,
+    "execution_cost_usd": 0.0,
+    "created_at": "2026-03-21T10:00:00Z",
+    "_phase_description": {
+      "setup": "리서치 + 전체 트리 스켈레톤 생성. 저비용 ($0.1~0.3)",
+      "execution": "선택된 노드의 에이전트 시뮬레이션. 노드당 ~$0.5~2"
+    }
+  },
+
+  "research": {
+    "topic": "진격의거인 에렌이 땅울림을 하지 않았다면 향후 100년",
+    "summary": "진격의 거인은 인류가 거대한 벽 안에서 거인의 위협으로부터 살아남는 세계를 배경으로 한다...",
+    "key_characters": [
+      {"name": "에렌 예거", "role": "시조의 거인 보유자", "description": "땅울림 대신 외교를 선택한 주인공"},
+      {"name": "미카사 아커만", "role": "아커만 혈통 전사", "description": "에렌을 지키며 평화를 모색"},
+      {"name": "아르민 알레르트", "role": "초대형 거인/전략가", "description": "외교와 협상의 최전선"},
+      {"name": "히스토리아 레이스", "role": "파라디 여왕", "description": "섬의 정치적 리더"},
+      {"name": "지크 예거", "role": "짐승의 거인", "description": "안락사 계획을 포기하지 않은 존재"}
+    ],
+    "key_factions": [
+      {"name": "파라디 엘디아인", "stance": "방어적", "goals": "섬 보호, 평화적 미래"},
+      {"name": "마레 제국", "stance": "공격적→변화", "goals": "거인의 힘 통제, 세계 패권"},
+      {"name": "세계연합", "stance": "적대→관망", "goals": "엘디아 위협 제거"}
+    ],
+    "world_setting": "벽 안의 파라디 섬은 고립된 국가, 바다 건너 마레 제국이 세계를 지배...",
+    "conflict_structure": "파라디 vs 세계 (공포와 불신), 파라디 내부 (강경파 vs 온건파)...",
+    "thematic_elements": ["자유 vs 안전", "힘의 대가", "세대 간 트라우마", "정체성과 차별"],
+    "topic_specific_metrics": [
+      {"name": "외교 진전도", "description": "파라디와 외부 세계 간 외교 관계", "weight": 0.25},
+      {"name": "내부 안정성", "description": "파라디 내부 정치적 통합", "weight": 0.20},
+      {"name": "엘디아 인권 지수", "description": "엘디아인 차별 수준 변화", "weight": 0.20}
+    ]
+  },
+
+  "scenario_tree": {
+    "_comment": "Setup 단계에서 생성. 각 노드는 skeleton만 (title, description, characters, environment). events/narrative 없음.",
+    "root_id": "node-root",
+    "max_depth": 3,
+    "nodes": {
+      "node-root": {
+        "node_id": "node-root",
+        "parent_id": null,
+        "depth": 0,
+        "title": "에렌의 선택: 땅울림 거부",
+        "description": "에렌 예거가 시조의 거인 힘으로 땅울림을 발동하는 대신, 다른 길을 택한다. 이 결정은 파라디 섬과 전세계의 운명을 완전히 바꾸게 된다.",
+        "characters": ["에렌 예거", "미카사 아커만", "아르민 알레르트", "히스토리아 레이스", "지크 예거"],
+        "environment": {
+          "location": "파라디 섬 — 시가시나 구역",
+          "time_period": "원작 결말 시점 (Year 0)",
+          "political_state": "긴장된 휴전 상태, 세계가 파라디의 다음 행동을 주시",
+          "resources": "벽의 거인(미사용), 군사력, 제한된 기술"
+        },
+        "status": "setup",
+        "children": ["node-a", "node-b", "node-c"],
+        "execution": null
+      },
+
+      "node-a": {
+        "node_id": "node-a",
+        "parent_id": "node-root",
+        "depth": 1,
+        "title": "거인의 평화협정",
+        "description": "마레 제국이 파라디에 기술 교류를 제안하고, 조건부 비핵화(거인 폐기) 협상이 시작된다. 아르민이 외교 특사로 활동하며, 히스토리아가 국제 무대에 등장한다.",
+        "characters": ["아르민 알레르트", "히스토리아 레이스", "에렌 예거"],
+        "environment": {
+          "location": "파라디 수도 → 마레 수도 레베리오",
+          "time_period": "Year 1~100",
+          "political_state": "조심스러운 외교 시작, 양측 강경파의 반발",
+          "resources": "거인의 힘(협상 카드), 무역 교류 시작"
+        },
+        "status": "setup",
+        "children": ["node-a1", "node-a2", "node-a3"],
+        "execution": null
+      },
+
+      "node-a1": {
+        "node_id": "node-a1",
+        "parent_id": "node-a",
+        "depth": 2,
+        "title": "거인 과학 르네상스",
+        "description": "협정이 성공하여 거인의 힘을 평화적으로 연구하는 국제 기관이 설립. 에너지와 의학 혁명의 시작.",
+        "characters": ["아르민 알레르트", "히스토리아 레이스", "국제 연구팀(신규)"],
+        "environment": {
+          "location": "파라디-마레 공동 연구소",
+          "time_period": "Year 30~100",
+          "political_state": "국제 협력 강화, 엘디아 차별 완화",
+          "resources": "거인 연구 데이터, 국제 펀딩"
+        },
+        "status": "setup",
+        "children": ["node-a1x", "node-a1y"],
+        "execution": null
+      },
+
+      "node-a1x": {
+        "node_id": "node-a1x",
+        "parent_id": "node-a1",
+        "depth": 3,
+        "title": "거인 없는 세계",
+        "description": "연구 끝에 거인의 힘이 완전히 제거된다. 엘디아인은 더 이상 거인이 될 수 없게 되며, 세계는 진정한 평화를 맞이하나 새로운 정체성 위기가 시작된다.",
+        "characters": ["에렌 예거(후계자)", "히스토리아 레이스", "세계 지도자들"],
+        "environment": {
+          "location": "전세계",
+          "time_period": "Year 80~100",
+          "political_state": "거인 위협 소멸, 엘디아 정체성 논쟁",
+          "resources": "거인의 힘 → 소멸, 대체 에너지"
+        },
+        "status": "setup",
+        "children": [],
+        "execution": null
+      },
+
+      "node-a1y": {
+        "node_id": "node-a1y",
+        "parent_id": "node-a1",
+        "depth": 3,
+        "title": "거인의 진화 — 신인류 논쟁",
+        "description": "연구 과정에서 거인의 힘이 변이, 소수의 엘디아인이 통제 가능한 초인적 능력을 갖게 되며 신인류 윤리 논쟁이 시작된다.",
+        "characters": ["변이 엘디아인(신규)", "세계 윤리위원회(신규)"],
+        "environment": {
+          "location": "연구소 → 전세계 논쟁",
+          "time_period": "Year 70~100",
+          "political_state": "초인류 윤리 논쟁, 신규 차별 우려",
+          "resources": "변이 거인 능력, 국제 규제 기관"
+        },
+        "status": "setup",
+        "children": [],
+        "execution": null
+      },
+
+      "node-a2": {
+        "node_id": "node-a2",
+        "parent_id": "node-a",
+        "depth": 2,
+        "title": "배신과 새로운 냉전",
+        "description": "마레가 협정을 위반, 비밀리에 거인 전사 프로그램을 재개. 신냉전 체제로 돌입하며 군비 경쟁이 시작된다.",
+        "characters": ["마레 군부(신규)", "에렌 예거", "아르민 알레르트"],
+        "environment": {
+          "location": "마레 비밀 시설 → 국제 무대",
+          "time_period": "Year 20~100",
+          "political_state": "신뢰 붕괴, 군비 경쟁, 정보전",
+          "resources": "비밀 거인 전사, 첩보 네트워크"
+        },
+        "status": "setup",
+        "children": [],
+        "execution": null
+      },
+
+      "node-a3": {
+        "node_id": "node-a3",
+        "parent_id": "node-a",
+        "depth": 2,
+        "title": "유미르의 의지와의 접촉",
+        "description": "13년 수명 저주를 풀기 위한 시조의 거인 연구 중, 좌표를 통해 유미르의 의지와 직접 접촉하게 된다.",
+        "characters": ["에렌 예거", "지크 예거", "유미르(신규)"],
+        "environment": {
+          "location": "좌표 — 길의 세계",
+          "time_period": "Year 10~13 (에렌 수명 마감 전)",
+          "political_state": "초월적 영역, 시간의 법칙이 다름",
+          "resources": "시조의 거인, 좌표 접근 권한"
+        },
+        "status": "setup",
+        "children": [],
+        "execution": null
+      },
+
+      "node-b": {
+        "node_id": "node-b",
+        "parent_id": "node-root",
+        "depth": 1,
+        "title": "파라디 내전",
+        "description": "에렌의 결정에 반발한 예거파가 쿠데타를 일으키며, 섬은 강경파와 온건파로 분열된다. 동료들이 적이 되는 비극.",
+        "characters": ["에렌 예거", "미카사 아커만", "예거파 지도부(신규)"],
+        "environment": {
+          "location": "파라디 섬 전역",
+          "time_period": "Year 1~30",
+          "political_state": "내전, 쿠데타, 시민 불복종",
+          "resources": "분열된 군사력, 거인 보유자들의 충성 분열"
+        },
+        "status": "setup",
+        "children": ["node-b1", "node-b2"],
+        "execution": null
+      },
+
+      "node-b1": {
+        "node_id": "node-b1",
+        "parent_id": "node-b",
+        "depth": 2,
+        "title": "예거파 군사독재 → 전면전",
+        "description": "강경파가 집권하여 마레에 선제공격을 감행, 전면전이 시작된다. 에렌은 연금되거나 처형된다.",
+        "characters": ["예거파 독재자(신규)", "마레 군부", "저항 세력"],
+        "environment": {
+          "location": "파라디 → 마레 전선",
+          "time_period": "Year 5~50",
+          "political_state": "군사독재, 전시 체제, 대량 파괴",
+          "resources": "전쟁 인프라, 거인의 힘(강제 계승)"
+        },
+        "status": "setup",
+        "children": [],
+        "execution": null
+      },
+
+      "node-b2": {
+        "node_id": "node-b2",
+        "parent_id": "node-b",
+        "depth": 2,
+        "title": "온건파 반격과 화해",
+        "description": "아르민과 미카사가 이끄는 온건파가 내전에서 승리, 전쟁 트라우마를 딛고 외교를 재개한다.",
+        "characters": ["아르민 알레르트", "미카사 아커만", "새로운 세대(신규)"],
+        "environment": {
+          "location": "파라디 섬 (전후 복구)",
+          "time_period": "Year 10~100",
+          "political_state": "민주화, 전후 트라우마 치유, 지연된 외교",
+          "resources": "복구 자원, 국제 지원, 차세대 리더십"
+        },
+        "status": "setup",
+        "children": [],
+        "execution": null
+      },
+
+      "node-c": {
+        "node_id": "node-c",
+        "parent_id": "node-root",
+        "depth": 1,
+        "title": "엘디아 디아스포라",
+        "description": "벽을 열고 전세계로 흩어진 엘디아인들이 각국에서 인권 운동을 시작, 새로운 형태의 글로벌 투쟁이 전개된다.",
+        "characters": ["엘디아 활동가들(신규)", "세계 각국 정부", "마레 내 엘디아 수용소 인물"],
+        "environment": {
+          "location": "전세계 (마레, 중동연합, 히즈르 등)",
+          "time_period": "Year 1~100",
+          "political_state": "디아스포라, 인권 운동, 차별과 연대",
+          "resources": "글로벌 네트워크, 미디어, 동맹국"
+        },
+        "status": "setup",
+        "children": [],
+        "execution": null
+      }
+    }
+  },
+
+  "_execution_example": {
+    "_comment": "Phase 2: 사용자가 node-a를 선택하면, 해당 노드만 실제 시뮬레이션 실행",
+    "node_id": "node-a",
+    "execution": {
+      "status": "complete",
+      "turns_simulated": 100,
+      "cost_usd": 1.85,
+      "score": {
+        "emergence": 0.68,
+        "narrative": 0.81,
+        "diversity": 0.65,
+        "novelty": 0.70,
+        "외교_진전도": 0.85,
+        "내부_안정성": 0.55,
+        "엘디아_인권_지수": 0.60
+      },
+      "composite_score": 0.72,
+      "turns": [
+        {
+          "turn_number": 1,
+          "year": 1,
+          "narrative": "에렌이 땅울림을 거부한 첫 해, 파라디 섬에는 혼란과 안도가 공존했다...",
+          "events": [
+            {"type": "interaction", "description": "아르민이 히스토리아에게 마레 외교관과의 비밀 회담을 제안", "participants": ["아르민", "히스토리아"]},
+            {"type": "interaction", "description": "에렌이 미카사에게 자신의 선택에 대한 불확실함을 토로", "participants": ["에렌", "미카사"]},
+            {"type": "world_event", "description": "마레 제국이 군사 작전을 6개월 유예한다고 공식 발표", "participants": []}
+          ],
+          "agent_actions": {}
+        }
+      ]
+    }
+  },
+
+  "workflow": {
+    "step_1_research": "주제 입력 → LLM으로 리서치 수행 → research document 생성 (1 API call, ~$0.03)",
+    "step_2_tree_skeleton": "리서치 기반 → 전체 트리 스켈레톤 생성 (각 노드: title, description, characters, environment) (1-2 API calls, ~$0.05-0.10)",
+    "step_3_display": "트리를 Decision Tree로 시각화. 사용자가 트리 구조를 확인/수정 가능",
+    "step_4_execute_node": "사용자가 노드 선택 → 해당 노드만 에이전트 시뮬레이션 실행 → events/narrative 생성 ($0.5~2 per node)",
+    "step_5_evaluate": "실행된 노드 평가 → score 산출 → expand/prune 결정",
+    "step_6_repeat": "DFS 또는 사용자 선택으로 다음 노드 실행"
+  }
+}

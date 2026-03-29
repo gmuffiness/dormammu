@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# OMC / Session state
+.omc/
+.ese/
+
+# Database
+*.db
+*.sqlite
+
+# Claude Code internal state
+.claude/commands/.omc/

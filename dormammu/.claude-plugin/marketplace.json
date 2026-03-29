@@ -1,0 +1,28 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dormammu",
+  "description": "What-If Fiction Simulator for Claude Code",
+  "owner": {
+    "name": "gmuffiness",
+    "email": "gmuffiness@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "dormammu",
+      "description": "What-If Fiction Simulator — DFS scenario tree exploration for alternate timeline stories",
+      "version": "0.2.0",
+      "author": {
+        "name": "gmuffiness",
+        "email": "gmuffiness@gmail.com"
+      },
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/gmuffiness/dormammu",
+      "repository": "https://github.com/gmuffiness/dormammu",
+      "license": "MIT",
+      "keywords": ["simulation", "fiction", "what-if", "storytelling"],
+      "tags": ["simulation", "fiction", "what-if", "storytelling"]
+    }
+  ],
+  "version": "0.2.0"
+}

@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dormammu Viewer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+  <style>
+    /* Tailwind typography-like prose for markdown */
+    .prose { color: #e5e7eb; line-height: 1.75; }
+    .prose h1, .prose h2, .prose h3, .prose h4 { color: #f9fafb; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; }
+    .prose h1 { font-size: 1.875rem; border-bottom: 1px solid #374151; padding-bottom: 0.4em; }
+    .prose h2 { font-size: 1.5rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.3em; }
+    .prose h3 { font-size: 1.25rem; }
+    .prose p { margin-top: 0.75em; margin-bottom: 0.75em; }
+    .prose ul, .prose ol { padding-left: 1.5em; margin: 0.75em 0; }
+    .prose li { margin: 0.3em 0; }
+    .prose code { background: #1f2937; color: #a5f3fc; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.875em; }
+    .prose pre { background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 1em; overflow-x: auto; margin: 1em 0; }
+    .prose pre code { background: none; padding: 0; color: #d1d5db; font-size: 0.85em; }
+    .prose blockquote { border-left: 3px solid #4b5563; padding-left: 1em; color: #9ca3af; margin: 1em 0; font-style: italic; }
+    .prose a { color: #60a5fa; text-decoration: underline; }
+    .prose hr { border-color: #374151; margin: 1.5em 0; }
+    .prose table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+    .prose th, .prose td { border: 1px solid #374151; padding: 0.5em 0.75em; }
+    .prose th { background: #1f2937; }
+    .prose strong { color: #f3f4f6; font-weight: 600; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #111827; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      #sidebar {
+        position: fixed !important;
+        left: 0; top: 48px; bottom: 0;
+        z-index: 40;
+        width: 85vw !important;
+        max-width: 320px;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+      }
+      #sidebar.mobile-open { transform: translateX(0); }
+      #sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0; top: 48px;
+        background: rgba(0,0,0,0.5);
+        z-index: 39;
+      }
+      #sidebar-overlay.visible { display: block; }
+      #mobile-menu-btn { display: flex !important; }
+      #tree-doc-panel { width: 100% !important; max-width: 100% !important; }
+      .prose { font-size: 0.9rem; }
+      .prose h1 { font-size: 1.35rem; }
+      .prose h2 { font-size: 1.15rem; }
+    }
+    @media (min-width: 769px) {
+      #mobile-menu-btn { display: none !important; }
+      #sidebar-overlay { display: none !important; }
+    }
+
+    /* Sidebar tree node */
+    .tree-node { cursor: pointer; border-radius: 6px; transition: background 0.15s; }
+    .tree-node:hover { background: rgba(255,255,255,0.05); }
+    .tree-node.active { background: rgba(99,102,241,0.2); border-left: 2px solid #6366f1; }
+    .tree-node.best-path { border-left: 2px solid #f59e0b; }
+    .tree-node.best-path.active { border-left: 2px solid #f59e0b; background: rgba(245,158,11,0.15); }
+    .tree-node.pruned { opacity: 0.5; }
+
+    /* Drop zone */
+    #drop-zone { transition: border-color 0.2s, background 0.2s; }
+    #drop-zone.drag-over { border-color: #6366f1 !important; background: rgba(99,102,241,0.1) !important; }
+
+    /* View mode toggle */
+    .mode-btn { transition: all 0.15s; }
+    .mode-btn.active {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-color: #475569;
+    }
+    .mode-btn:not(.active) {
+      background: transparent;
+      color: #64748b;
+      border-color: transparent;
+    }
+    .mode-btn:not(.active):hover {
+      color: #94a3b8;
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* SVG tree view */
+    #tree-view-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0b1120;
+      cursor: grab;
+    }
+    #tree-view-container.grabbing { cursor: grabbing; }
+
+    #tree-svg {
+      display: block;
+      transform-origin: 0 0;
+      user-select: none;
+    }
+
+    /* SVG node styles (applied via SVG attributes, but cursor via CSS) */
+    .svg-node-group { cursor: pointer; }
+
+    /* Bottom info panel */
+    #tree-info-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.96);
+      border-top: 1px solid #1e293b;
+      backdrop-filter: blur(8px);
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      transform: translateY(100%);
+      opacity: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    /* Tree right document panel */
+    #tree-doc-panel {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 45%;
+      max-width: 560px;
+      background: rgba(15, 23, 42, 0.97);
+      border-left: 1px solid #1e293b;
+      backdrop-filter: blur(8px);
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      overflow-y: auto;
+      z-index: 20;
+    }
+    #tree-doc-panel.visible { transform: translateX(0); }
+
+    #tree-info-panel.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Grid dots background for SVG canvas */
+    #tree-view-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, #1e293b 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col overflow-hidden">
+
+  <!-- Top bar -->
+  <header class="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center gap-3 flex-shrink-0">
+    <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" style="display:none;" class="items-center justify-center w-8 h-8 rounded text-gray-400 hover:text-gray-200 hover:bg-gray-700 transition-colors mr-1">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5h12M3 9h12M3 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+    <a href="/" class="text-indigo-400 font-bold text-lg tracking-tight hover:text-indigo-300 transition-colors" style="text-decoration:none;">Dormammu</a>
+    <span class="text-gray-500 text-sm hidden sm:inline">Simulation Viewer</span>
+
+    <!-- View mode toggle -->
+    <div class="flex items-center gap-1 ml-4 bg-gray-900 rounded-lg p-0.5 border border-gray-700">
+      <button id="btn-mode-doc" onclick="setViewMode('doc')"
+        class="mode-btn active text-xs px-3 py-1 rounded-md border font-medium flex items-center gap-1.5">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <rect x="1" y="1" width="10" height="2" rx="1" fill="currentColor" opacity="0.7"/>
+          <rect x="1" y="5" width="7" height="1.5" rx="0.75" fill="currentColor" opacity="0.5"/>
+          <rect x="1" y="8.5" width="9" height="1.5" rx="0.75" fill="currentColor" opacity="0.5"/>
+        </svg>
+        문서
+      </button>
+      <button id="btn-mode-tree" onclick="setViewMode('tree')"
+        class="mode-btn text-xs px-3 py-1 rounded-md border font-medium flex items-center gap-1.5">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <circle cx="6" cy="2" r="1.5" fill="currentColor" opacity="0.8"/>
+          <circle cx="2.5" cy="8.5" r="1.5" fill="currentColor" opacity="0.8"/>
+          <circle cx="9.5" cy="8.5" r="1.5" fill="currentColor" opacity="0.8"/>
+          <line x1="6" y1="3.5" x2="2.5" y2="7" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+          <line x1="6" y1="3.5" x2="9.5" y2="7" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+        </svg>
+        트리
+      </button>
+    </div>
+
+    <div class="flex-1"></div>
+    <button id="btn-drop-mode" onclick="toggleDropZone()"
+      class="text-xs px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 border border-gray-600">
+      파일 드롭
+    </button>
+    <div id="sim-badge" class="hidden text-xs px-3 py-1 rounded-full bg-indigo-900 text-indigo-300 border border-indigo-700">
+      <span id="badge-sim-id"></span>
+    </div>
+  </header>
+
+  <!-- Drop zone overlay -->
+  <div id="drop-zone-panel" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-50 flex items-center justify-center">
+    <div id="drop-zone"
+      class="border-2 border-dashed border-gray-600 rounded-2xl p-16 text-center max-w-lg w-full mx-4"
+      ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <div class="text-5xl mb-4">📂</div>
+      <p class="text-gray-300 text-lg font-medium mb-2">파일을 여기에 드롭하세요</p>
+      <p class="text-gray-500 text-sm mb-4">tree-index.json 과 node.md 파일들을 함께 드롭하거나,<br>폴더 안의 모든 파일을 선택해서 드롭하세요.</p>
+      <input type="file" id="file-input" multiple accept=".json,.md" class="hidden" onchange="handleFileInput(event)" />
+      <button onclick="document.getElementById('file-input').click()"
+        class="text-sm px-4 py-2 rounded bg-indigo-700 hover:bg-indigo-600 text-white mr-2">파일 선택</button>
+      <button onclick="toggleDropZone()"
+        class="text-sm px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-gray-300">닫기</button>
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+    <!-- Sidebar (doc mode only) -->
+    <aside id="sidebar" class="w-72 bg-gray-850 border-r border-gray-700 flex flex-col overflow-hidden flex-shrink-0" style="background:#0f172a;">
+
+      <!-- Sim info -->
+      <div id="sim-info" class="p-4 border-b border-gray-700 flex-shrink-0">
+        <div id="sim-empty" class="text-gray-500 text-sm text-center py-2">
+          시뮬레이션 데이터를 찾을 수 없습니다.
+          <br/><span class="text-xs mt-1 block text-gray-600">서버를 실행하거나 파일을 드롭하세요.</span>
+        </div>
+        <div id="sim-loaded" class="hidden">
+          <h2 id="sim-topic" class="text-sm font-semibold text-gray-100 leading-snug mb-2 cursor-pointer hover:text-indigo-300 transition-colors" onclick="goOverview()"></h2>
+          <div class="flex gap-2 flex-wrap text-xs">
+            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400">
+              노드 <span id="stat-total" class="text-gray-200 font-medium">0</span>개
+            </span>
+            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400">
+              확장 <span id="stat-expanded" class="text-green-400 font-medium">0</span>
+            </span>
+            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400">
+              가지치기 <span id="stat-pruned" class="text-red-400 font-medium">0</span>
+            </span>
+          </div>
+          <div id="stat-extras" class="hidden flex gap-2 flex-wrap text-xs mt-1.5">
+            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400">
+              ⏱ <span id="stat-duration" class="text-gray-200 font-medium">-</span>
+            </span>
+            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400">
+              📝 <span id="stat-chars" class="text-gray-200 font-medium">-</span>
+            </span>
+            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400">
+              💰 <span id="stat-cost" class="text-gray-200 font-medium">-</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Document links -->
+      <div id="doc-links" class="border-b border-gray-700 flex-shrink-0 hidden">
+        <div class="px-4 pt-3 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">문서</div>
+        <ul id="doc-list" class="px-2 pb-2 space-y-0.5"></ul>
+      </div>
+
+      <!-- Characters -->
+      <div id="char-links" class="border-b border-gray-700 flex-shrink-0 hidden">
+        <div class="px-4 pt-3 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">캐릭터</div>
+        <ul id="char-list" class="px-2 pb-2 space-y-0.5"></ul>
+      </div>
+
+      <!-- Tree -->
+      <div class="flex flex-col flex-1 overflow-hidden">
+        <div class="px-4 pt-3 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wider flex-shrink-0">시나리오 트리</div>
+        <div id="tree-empty" class="px-4 text-xs text-gray-600 italic">트리 데이터 없음</div>
+        <div id="tree-root" class="flex-1 overflow-y-auto px-2 pb-4 text-sm space-y-0.5"></div>
+      </div>
+
+    </aside>
+
+    <!-- Doc mode content area -->
+    <main id="doc-content" class="flex-1 overflow-y-auto p-6">
+      <div id="content-area">
+        <!-- Default: welcome screen -->
+        <div id="welcome" class="max-w-2xl mx-auto mt-12 text-center">
+          <div class="text-6xl mb-6">🌀</div>
+          <h1 class="text-2xl font-bold text-gray-100 mb-3">Dormammu Viewer</h1>
+          <p class="text-gray-400 mb-8">시뮬레이션 결과를 탐색하세요.</p>
+          <div class="bg-gray-800 rounded-xl p-6 text-left text-sm space-y-3 border border-gray-700">
+            <p class="text-gray-300 font-medium">시작 방법</p>
+            <div class="space-y-2 text-gray-400">
+              <p><span class="text-indigo-400 font-mono">방법 A</span> — Python 서버 실행 (추천):</p>
+              <pre class="bg-gray-900 rounded p-3 text-xs text-gray-300 overflow-x-auto">python viewer/serve.py .dormammu/output/&lt;sim-id&gt;</pre>
+              <p>그 다음 이 페이지를 <span class="font-mono text-green-400">http://localhost:3000</span> 으로 열면 자동 로드됩니다.</p>
+            </div>
+            <div class="border-t border-gray-700 pt-3 space-y-2 text-gray-400">
+              <p><span class="text-indigo-400 font-mono">방법 B</span> — 파일 드롭:</p>
+              <p>우측 상단 <span class="bg-gray-700 px-1.5 py-0.5 rounded text-gray-300 text-xs">파일 드롭</span> 버튼을 누르고 <span class="font-mono text-yellow-400">tree-index.json</span> 과 node.md 파일들을 드롭하세요.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overview (shown after data load) -->
+        <div id="overview" class="hidden max-w-3xl prose"></div>
+
+        <!-- Markdown view -->
+        <div id="md-view" class="hidden max-w-3xl prose"></div>
+      </div>
+    </main>
+
+    <!-- Tree mode content area -->
+    <div id="tree-content" class="hidden flex-1 relative overflow-hidden">
+      <div id="tree-view-container">
+        <svg id="tree-svg" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Glow filter for selected node -->
+            <filter id="glow-indigo" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <!-- Glow filter for best path node -->
+            <filter id="glow-amber" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g id="svg-pan-group"></g>
+        </svg>
+      </div>
+
+      <!-- Right document panel (tree mode) -->
+      <div id="tree-doc-panel">
+        <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-2 border-b border-gray-700" style="background:rgba(15,23,42,0.98);">
+          <span id="tree-doc-panel-title" class="text-xs font-mono text-indigo-400"></span>
+          <button onclick="closeTreeDocPanel()" class="text-gray-500 hover:text-gray-300 text-lg leading-none">&times;</button>
+        </div>
+        <div id="tree-doc-panel-body" class="p-4 prose text-sm"></div>
+      </div>
+
+      <!-- Bottom info panel -->
+      <div id="tree-info-panel">
+        <div class="px-5 py-3 flex items-start gap-4">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span id="panel-node-id" class="text-xs font-mono text-indigo-400"></span>
+              <span id="panel-score-badge" class="text-xs px-2 py-0.5 rounded-full font-semibold"></span>
+              <span id="panel-status-badge" class="text-xs px-2 py-0.5 rounded-full"></span>
+            </div>
+            <p id="panel-title" class="text-sm font-semibold text-gray-100 mb-1 leading-snug"></p>
+            <p id="panel-narrative" class="text-xs text-gray-400 leading-relaxed line-clamp-3"></p>
+          </div>
+          <div class="flex-shrink-0 flex flex-col gap-1.5 pt-0.5">
+            <button id="panel-open-doc" onclick="panelOpenDoc()"
+              class="text-xs px-3 py-1.5 rounded bg-indigo-700 hover:bg-indigo-600 text-white whitespace-nowrap transition-colors">
+              문서 보기
+            </button>
+            <button onclick="closeInfoPanel()"
+              class="text-xs px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 whitespace-nowrap transition-colors">
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tree mode zoom controls -->
+      <div class="absolute top-3 right-3 flex flex-col gap-1 z-10">
+        <button onclick="treeZoom(1.2)"
+          class="w-8 h-8 rounded bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center justify-center text-sm font-bold transition-colors">+</button>
+        <button onclick="treeZoom(1/1.2)"
+          class="w-8 h-8 rounded bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center justify-center text-sm font-bold transition-colors">−</button>
+        <button onclick="treeResetView()"
+          class="w-8 h-8 rounded bg-gray-800 border border-gray-700 text-gray-400 hover:bg-gray-700 flex items-center justify-center transition-colors" title="뷰 초기화">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 2a5 5 0 1 0 4.33 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M11 2l.33 2.5L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Tree mode legend -->
+      <div class="absolute bottom-3 right-3 bg-gray-800 bg-opacity-90 border border-gray-700 rounded-lg px-3 py-2 text-xs space-y-1 z-10">
+        <div class="text-gray-500 font-semibold uppercase tracking-wider text-xs mb-1.5">범례</div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-green-900 border border-green-500 inline-block"></span><span class="text-gray-400">점수 &gt; 0.7</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-yellow-900 border border-yellow-500 inline-block"></span><span class="text-gray-400">0.3 – 0.7</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-red-900 border border-red-500 inline-block"></span><span class="text-gray-400">점수 &lt; 0.3</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm bg-gray-700 border border-gray-500 border-dashed inline-block opacity-50"></span><span class="text-gray-400">가지치기</span></div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-sm border-2 border-amber-500 inline-block"></span><span class="text-gray-400">Best Path ★</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ─── State ───────────────────────────────────────────────────────────────
+    let state = {
+      index: null,        // tree-index.json content
+      runState: null,     // run-state.json content
+      files: {},          // path -> text content (from drop or server)
+      activeNodeId: null,
+      activeDocPath: null,
+      expandedNodes: new Set(),
+      viewMode: 'doc',    // 'doc' | 'tree'
+      // SVG tree pan/zoom
+      characters: [],     // character filenames
+      svgTransform: { x: 0, y: 40, scale: 1 },
+      svgLayouts: {},     // nodeId -> { x, y }
+      treePanStart: null,
+      selectedTreeNodeId: null,
+    };
+
+    const DOC_LABELS = {
+      '01-background-research.md':   '01 배경 리서치',
+      '02-world-rules.md':       '02 세계관 규칙',
+      '03-character-profiles.md':'03 캐릭터 프로필',
+      '05-deepen-best-path.md':  '05 Best Path 심화',
+      '07-best-path-metadata.md':'07 Best Path 메타',
+    };
+
+    // ─── Routing ──────────────────────────────────────────────────────────────
+    function getSimIdFromPath() {
+      const m = location.pathname.match(/^\/sim\/([^/]+)/);
+      return m ? m[1] : null;
+    }
+
+    function getDeepPath() {
+      // /sim/<id>/doc/<filename> or /sim/<id>/node/<nodeId> or /sim/<id>/char/<filename>
+      const docMatch = location.pathname.match(/^\/sim\/[^/]+\/doc\/(.+)$/);
+      if (docMatch) return { type: 'doc', key: decodeURIComponent(docMatch[1]) };
+      const nodeMatch = location.pathname.match(/^\/sim\/[^/]+\/node\/(.+)$/);
+      if (nodeMatch) return { type: 'node', key: decodeURIComponent(nodeMatch[1]) };
+      const charMatch = location.pathname.match(/^\/sim\/[^/]+\/char\/(.+)$/);
+      if (charMatch) return { type: 'char', key: decodeURIComponent(charMatch[1]) };
+      return null;
+    }
+
+    function pushDeepLink(type, key) {
+      if (!state.currentSimId) return;
+      const url = `/sim/${state.currentSimId}/${type}/${encodeURIComponent(key)}`;
+      history.pushState({ type, key }, '', url);
+    }
+
+    function pushSimRoot() {
+      if (!state.currentSimId) return;
+      history.pushState(null, '', `/sim/${state.currentSimId}`);
+    }
+
+    window.addEventListener('popstate', () => {
+      const deep = getDeepPath();
+      if (deep) {
+        if (deep.type === 'doc') openDoc(deep.key, true);
+        else if (deep.type === 'node') openNode(deep.key, true);
+        else if (deep.type === 'char') openChar(deep.key, true);
+      } else if (getSimIdFromPath()) {
+        showOverview();
+      }
+    });
+
+    // ─── Boot: route based on URL ───────────────────────────────────────────
+    async function boot() {
+      const simId = getSimIdFromPath();
+      if (simId) {
+        // Simulation view
+        state.currentSimId = simId;
+        // Try loading tree-index (may not exist yet during Phase 1-3)
+        try {
+          const resp = await fetch(`/data/${simId}/tree-index.json`);
+          if (resp.ok) state.index = await resp.json();
+        } catch (_) {}
+        // Always try run-state
+        try {
+          const rs = await fetch(`/data/${simId}/run-state.json`);
+          if (rs.ok) state.runState = await rs.json();
+        } catch (_) {}
+        // Fetch available files (works with or without tree-index)
+        await fetchServerFiles(state.index, simId);
+        // Show content if we have anything (docs, run-state, or index)
+        if (Object.keys(state.files).length > 0 || state.index || state.runState) {
+          renderAll();
+        } else {
+          showWelcome();
+        }
+      } else {
+        // Home view
+        await showHome();
+      }
+    }
+
+    async function fetchServerFiles(index, simId) {
+      const base = `/data/${simId}/`;
+      const paths = [];
+      for (const name of Object.keys(DOC_LABELS)) paths.push(name);
+      for (const [id, node] of Object.entries((index && index.nodes) || {})) {
+        paths.push(node.path + '/node.md');
+      }
+      // Fetch character file list
+      try {
+        const charResp = await fetch(`/api/characters/${simId}`);
+        if (charResp.ok) {
+          state.characters = await charResp.json();
+          for (const name of state.characters) {
+            paths.push('characters/' + name);
+          }
+        }
+      } catch (_) {}
+      await Promise.allSettled(paths.map(async (p) => {
+        try {
+          const r = await fetch(base + p);
+          if (r.ok) state.files[p] = await r.text();
+        } catch (_) {}
+      }));
+    }
+
+    // ─── Home: list all simulations ──────────────────────────────────────────
+    async function showHome() {
+      document.getElementById('sidebar').classList.add('hidden');
+      document.getElementById('welcome').classList.add('hidden');
+      document.getElementById('overview').classList.add('hidden');
+      document.getElementById('md-view').classList.add('hidden');
+
+      const docContent = document.getElementById('doc-content');
+      docContent.classList.remove('hidden');
+      document.getElementById('tree-content').classList.add('hidden');
+
+      let sims = [];
+      try {
+        const resp = await fetch('/api/sims');
+        if (resp.ok) sims = await resp.json();
+      } catch (_) {}
+
+      const content = document.getElementById('content-area');
+
+      if (sims.length === 0) {
+        content.innerHTML = `
+          <div class="max-w-2xl mx-auto mt-12 text-center">
+            <div class="text-6xl mb-6">&#127744;</div>
+            <h1 class="text-2xl font-bold text-gray-100 mb-3">Dormammu</h1>
+            <p class="text-gray-400 mb-4">아직 시뮬레이션 결과가 없습니다.</p>
+            <p class="text-gray-500 text-sm"><code>/dormammu:simulate</code> 로 시뮬레이션을 실행하세요.</p>
+          </div>`;
+        return;
+      }
+
+      let html = `<div class="max-w-4xl mx-auto">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-2xl font-bold text-gray-100">Simulations</span>
+          <span class="text-sm text-gray-500">${sims.length}개</span>
+        </div>
+        <div class="space-y-3">`;
+
+      for (const sim of sims) {
+        const topic = sim.topic || sim.sim_id;
+        const phase = sim.phase || '';
+        const phaseColor = phase === 'complete' ? 'bg-green-900 text-green-300' : phase === 'running' ? 'bg-yellow-900 text-yellow-300' : 'bg-gray-800 text-gray-400';
+        const bestScore = sim.best_score != null ? sim.best_score.toFixed(3) : '-';
+        const nodeCount = sim.node_count || 0;
+        const maxDepth = sim.max_depth || 0;
+
+        // Duration
+        let duration = '';
+        if (sim.started_at && sim.updated_at) {
+          const ms = new Date(sim.updated_at) - new Date(sim.started_at);
+          const mins = Math.floor(ms / 60000);
+          const hrs = Math.floor(mins / 60);
+          const remMins = mins % 60;
+          duration = hrs > 0 ? `${hrs}h ${remMins}m` : `${mins}m`;
+        }
+
+        html += `
+          <a href="/sim/${sim.sim_id}" class="block rounded-xl border border-gray-700 p-5 hover:border-indigo-600 hover:bg-gray-800/50 transition-all cursor-pointer" style="background:#0f172a; text-decoration:none;">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="text-xs font-mono text-indigo-400">${escHtml(sim.sim_id)}</span>
+                  ${phase ? `<span class="text-xs px-2 py-0.5 rounded-full ${phaseColor}">${escHtml(phase)}</span>` : ''}
+                  ${duration ? `<span class="text-xs text-gray-500">${duration}</span>` : ''}
+                </div>
+                <h3 class="text-base font-semibold text-gray-100 mb-2 leading-snug">${escHtml(topic)}</h3>
+                <div class="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
+                  <span>Nodes: <span class="text-gray-300">${nodeCount}</span></span>
+                  <span>Depth: <span class="text-gray-300">${maxDepth}</span></span>
+                  ${sim.total_duration > 0 ? `<span>⏱ <span class="text-gray-300">${Math.floor(sim.total_duration/3600) > 0 ? Math.floor(sim.total_duration/3600)+'h ' : ''}${Math.floor((sim.total_duration%3600)/60)}m${sim.total_duration%60}s</span></span>` : ''}
+                  ${sim.total_chars > 0 ? `<span>📝 <span class="text-gray-300">${sim.total_chars.toLocaleString()}자</span></span>` : ''}
+                  ${sim.total_cost > 0 ? `<span>💰 <span class="text-gray-300">$${sim.total_cost.toFixed(2)}</span></span>` : ''}
+                </div>
+              </div>
+              <div class="flex-shrink-0 text-right">
+                <div class="text-xs text-gray-500 mb-1">Best</div>
+                <div class="text-xl font-bold ${sim.best_score != null && sim.best_score > 0.7 ? 'text-amber-400' : 'text-gray-400'}">${bestScore}</div>
+              </div>
+            </div>
+          </a>`;
+      }
+
+      html += `</div></div>`;
+      content.innerHTML = html;
+    }
+
+    // ─── Mobile sidebar ──────────────────────────────────────────────────────
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.toggle('mobile-open');
+      overlay.classList.toggle('visible');
+    }
+    function closeMobileSidebar() {
+      document.getElementById('sidebar').classList.remove('mobile-open');
+      document.getElementById('sidebar-overlay').classList.remove('visible');
+    }
+
+    // ─── View mode ────────────────────────────────────────────────────────────
+    function setViewMode(mode) {
+      state.viewMode = mode;
+
+      const sidebar     = document.getElementById('sidebar');
+      const docContent  = document.getElementById('doc-content');
+      const treeContent = document.getElementById('tree-content');
+      const btnDoc      = document.getElementById('btn-mode-doc');
+      const btnTree     = document.getElementById('btn-mode-tree');
+
+      if (mode === 'doc') {
+        sidebar.classList.remove('hidden');
+        docContent.classList.remove('hidden');
+        treeContent.classList.add('hidden');
+        btnDoc.classList.add('active');
+        btnTree.classList.remove('active');
+      } else {
+        sidebar.classList.add('hidden');
+        docContent.classList.add('hidden');
+        treeContent.classList.remove('hidden');
+        btnDoc.classList.remove('active');
+        btnTree.classList.add('active');
+
+        // Render SVG tree
+        if (state.index) renderSvgTree();
+      }
+    }
+
+    // ─── Render all UI ───────────────────────────────────────────────────────
+    function renderAll() {
+      const idx = state.index;
+      if (!idx) return;
+
+      document.getElementById('sim-badge').classList.remove('hidden');
+      document.getElementById('badge-sim-id').textContent = idx.sim_id || '';
+
+      document.getElementById('sim-empty').classList.add('hidden');
+      document.getElementById('sim-loaded').classList.remove('hidden');
+      document.getElementById('sim-topic').textContent = idx.topic || '(제목 없음)';
+
+      const nodes = Object.values(idx.nodes || {});
+      document.getElementById('stat-total').textContent = nodes.length;
+      document.getElementById('stat-expanded').textContent = nodes.filter(n => n.status === 'expanded').length;
+      document.getElementById('stat-pruned').textContent = nodes.filter(n => n.status === 'pruned').length;
+
+      // Aggregate stats: duration, chars, cost
+      const totalDur = nodes.reduce((s, n) => s + (n.duration_sec || 0), 0);
+      const totalChars = nodes.reduce((s, n) => s + (n.chars || 0), 0);
+      const totalCost = nodes.reduce((s, n) => s + (parseFloat(n.cost) || 0), 0);
+      const hasExtras = totalDur > 0 || totalChars > 0 || totalCost > 0;
+
+      if (hasExtras) {
+        document.getElementById('stat-extras').classList.remove('hidden');
+        const durMin = Math.floor(totalDur / 60);
+        const durSec = totalDur % 60;
+        document.getElementById('stat-duration').textContent = totalDur > 0 ? `${durMin}m${durSec}s` : '-';
+        document.getElementById('stat-chars').textContent = totalChars > 0 ? totalChars.toLocaleString() + '자' : '-';
+        document.getElementById('stat-cost').textContent = totalCost > 0 ? '$' + totalCost.toFixed(2) : '-';
+      }
+
+      renderDocLinks();
+      renderCharLinks();
+      renderTree();
+
+      // Deep link: open specific doc/node/char if URL has path
+      const deep = getDeepPath();
+      if (deep) {
+        if (deep.type === 'doc') openDoc(deep.key, true);
+        else if (deep.type === 'node') openNode(deep.key, true);
+        else if (deep.type === 'char') openChar(deep.key, true);
+      } else {
+        showOverview();
+      }
+    }
+
+    function renderDocLinks() {
+      const list = document.getElementById('doc-list');
+      list.innerHTML = '';
+      let any = false;
+      for (const [filename, label] of Object.entries(DOC_LABELS)) {
+        if (!state.files[filename]) continue;
+        any = true;
+        const li = document.createElement('li');
+        li.innerHTML = `<button onclick="openDoc('${filename}')"
+          class="w-full text-left px-3 py-1.5 rounded text-gray-400 hover:text-gray-100 hover:bg-gray-800 text-xs truncate transition-colors doc-btn" data-path="${filename}">
+          ${label}
+        </button>`;
+        list.appendChild(li);
+      }
+      if (any) document.getElementById('doc-links').classList.remove('hidden');
+    }
+
+    function renderCharLinks() {
+      const list = document.getElementById('char-list');
+      list.innerHTML = '';
+      if (!state.characters || state.characters.length === 0) return;
+      document.getElementById('char-links').classList.remove('hidden');
+      for (const filename of state.characters) {
+        const label = filename.replace(/\.md$/, '').replace(/-/g, ' ');
+        const li = document.createElement('li');
+        li.innerHTML = `<button onclick="openChar('${filename}')"
+          class="w-full text-left px-3 py-1.5 rounded text-gray-400 hover:text-gray-100 hover:bg-gray-800 text-xs truncate transition-colors char-btn" data-path="${filename}">
+          ${label}
+        </button>`;
+        list.appendChild(li);
+      }
+    }
+
+    function openChar(filename, skipPush) {
+      state.activeDocPath = 'char:' + filename;
+      state.activeNodeId = null;
+      highlightActive();
+      if (!skipPush) pushDeepLink('char', filename);
+
+      const filePath = 'characters/' + filename;
+      const content = state.files[filePath];
+      document.getElementById('welcome').classList.add('hidden');
+      document.getElementById('overview').classList.add('hidden');
+      const mdView = document.getElementById('md-view');
+      mdView.classList.remove('hidden');
+
+      if (content) {
+        mdView.innerHTML = DOMPurify.sanitize(marked.parse(content));
+      } else {
+        mdView.innerHTML = `<p class="text-gray-500 italic">파일을 불러올 수 없습니다: ${escHtml(filePath)}</p>`;
+      }
+    }
+
+    function renderTree() {
+      const treeRoot = document.getElementById('tree-root');
+      treeRoot.innerHTML = '';
+      const idx = state.index;
+      if (!idx || !idx.nodes) return;
+
+      document.getElementById('tree-empty').classList.add('hidden');
+
+      const bestSet = new Set(idx.best_path || []);
+      const nodes = idx.nodes;
+
+      const children = {};
+      for (const [id, node] of Object.entries(nodes)) {
+        const parent = node.parent;
+        if (!children[parent]) children[parent] = [];
+        children[parent].push(id);
+      }
+
+      const roots = (children[null] || []).sort();
+
+      for (const [id, node] of Object.entries(nodes)) {
+        if (node.status !== 'pruned') state.expandedNodes.add(id);
+      }
+
+      function renderNode(id, depth) {
+        const node = nodes[id];
+        if (!node) return;
+        const kids = (children[id] || []).sort();
+        const hasCh = kids.length > 0;
+        const isPruned = node.status === 'pruned';
+        const isExpanded = state.expandedNodes.has(id);
+        const inBest = bestSet.has(id);
+
+        const score = node.composite_score ?? null;
+        const scoreColor = score === null ? 'text-gray-500'
+          : score > 0.7 ? 'text-green-400'
+          : score >= 0.3 ? 'text-yellow-400'
+          : 'text-red-400';
+
+        let icon;
+        if (isPruned)        icon = '<span class="text-red-500 select-none">✕</span>';
+        else if (!hasCh)     icon = '<span class="text-blue-400 select-none">●</span>';
+        else if (isExpanded) icon = '<span class="text-gray-400 select-none">▼</span>';
+        else                 icon = '<span class="text-gray-400 select-none">▶</span>';
+
+        const star = inBest ? ' <span class="text-yellow-400 text-xs">★</span>' : '';
+        const titleStyle = isPruned ? 'line-through text-gray-500' : 'text-gray-200';
+        const indent = depth * 16;
+
+        const el = document.createElement('div');
+        el.className = [
+          'tree-node px-2 py-1.5',
+          isPruned ? 'pruned' : '',
+          inBest && !isPruned ? 'best-path' : '',
+        ].join(' ');
+        el.dataset.nodeId = id;
+        el.style.paddingLeft = (8 + indent) + 'px';
+
+        el.innerHTML = `
+          <div class="flex items-start gap-1.5">
+            <span class="flex-shrink-0 mt-0.5 w-4 text-center text-xs">${icon}</span>
+            <span class="flex-1 min-w-0">
+              <span class="${titleStyle} text-xs leading-snug">${escHtml(node.title || id)}${star}</span>
+              ${score !== null ? `<span class="${scoreColor} text-xs ml-1">(${score.toFixed(2)})</span>` : ''}
+            </span>
+          </div>`;
+
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (hasCh && !isPruned) {
+            if (state.expandedNodes.has(id)) state.expandedNodes.delete(id);
+            else state.expandedNodes.add(id);
+            renderTree();
+          }
+          if (!isPruned) openNode(id);
+        });
+
+        treeRoot.appendChild(el);
+
+        if (hasCh && isExpanded) {
+          for (const child of kids) renderNode(child, depth + 1);
+        }
+      }
+
+      for (const root of roots) renderNode(root, 0);
+      highlightActive();
+    }
+
+    function highlightActive() {
+      document.querySelectorAll('.tree-node').forEach(el => el.classList.remove('active'));
+      if (state.activeNodeId) {
+        const el = document.querySelector(`.tree-node[data-node-id="${state.activeNodeId}"]`);
+        if (el) el.classList.add('active');
+      }
+      document.querySelectorAll('.doc-btn').forEach(el => el.classList.remove('text-indigo-300', 'bg-gray-800'));
+      if (state.activeDocPath && !state.activeDocPath.startsWith('char:')) {
+        const el = document.querySelector(`.doc-btn[data-path="${state.activeDocPath}"]`);
+        if (el) el.classList.add('text-indigo-300', 'bg-gray-800');
+      }
+      document.querySelectorAll('.char-btn').forEach(el => el.classList.remove('text-indigo-300', 'bg-gray-800'));
+      if (state.activeDocPath && state.activeDocPath.startsWith('char:')) {
+        const charFile = state.activeDocPath.replace('char:', '');
+        const el = document.querySelector(`.char-btn[data-path="${charFile}"]`);
+        if (el) el.classList.add('text-indigo-300', 'bg-gray-800');
+      }
+    }
+
+    // ─── Content rendering ───────────────────────────────────────────────────
+    function showWelcome() {
+      document.getElementById('welcome').classList.remove('hidden');
+      document.getElementById('overview').classList.add('hidden');
+      document.getElementById('md-view').classList.add('hidden');
+    }
+
+    function goOverview() {
+      state.activeNodeId = null;
+      state.activeDocPath = null;
+      highlightActive();
+      pushSimRoot();
+      showOverview();
+    }
+
+    function showOverview() {
+      document.getElementById('welcome').classList.add('hidden');
+      document.getElementById('overview').classList.remove('hidden');
+      document.getElementById('md-view').classList.add('hidden');
+
+      const idx = state.index;
+      const rs = state.runState;
+      const nodes = idx.nodes || {};
+      const bestPath = idx.best_path || [];
+
+      const total = Object.keys(nodes).length;
+      const expanded = Object.values(nodes).filter(n => n.status === 'expanded').length;
+      const pending = Object.values(nodes).filter(n => n.status === 'pending').length;
+      const pruned = Object.values(nodes).filter(n => n.status === 'pruned').length;
+      const leaf = Object.values(nodes).filter(n => n.status === 'leaf').length;
+
+      // Compute metrics from data
+      const scores = Object.values(nodes).map(n => n.composite_score).filter(s => s != null);
+      const bestNode = bestPath.length > 0 ? bestPath[bestPath.length - 1] : null;
+      const bestScore = bestNode && nodes[bestNode] ? nodes[bestNode].composite_score : (scores.length ? Math.max(...scores) : null);
+      const avgScore = scores.length ? (scores.reduce((a,b) => a+b, 0) / scores.length) : null;
+      const maxDepth = Math.max(0, ...Object.values(nodes).map(n => n.depth || 0));
+      const nodesCompleted = rs?.nodes_completed ?? expanded;
+
+      // Duration
+      let duration = '';
+      if (rs?.started_at && rs?.updated_at) {
+        const ms = new Date(rs.updated_at) - new Date(rs.started_at);
+        const mins = Math.floor(ms / 60000);
+        const hrs = Math.floor(mins / 60);
+        const remMins = mins % 60;
+        duration = hrs > 0 ? `${hrs}h ${remMins}m` : `${mins}m`;
+      }
+
+      const phase = rs?.phase || 'unknown';
+      const phaseLabel = phase === 'complete' ? 'Complete' : phase === 'running' ? 'Running' : phase;
+      const phaseColor = phase === 'complete' ? 'text-green-400' : phase === 'running' ? 'text-yellow-400' : 'text-gray-400';
+
+      let html = '';
+
+      // ── Header ──
+      html += `<div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-100 mb-1" style="border:none; padding:0; margin:0;">${escHtml(idx.topic || '시뮬레이션')}</h1>
+        <div class="flex items-center gap-3 text-xs text-gray-500 mt-2">
+          <span>Sim ID: <code class="text-gray-400">${escHtml(idx.sim_id || '-')}</code></span>
+          <span class="${phaseColor} font-semibold uppercase">${escHtml(phaseLabel)}</span>
+          ${rs?.dfs_engine ? `<span class="bg-gray-800 px-2 py-0.5 rounded text-gray-300 border border-gray-700">Engine: <strong class="text-indigo-300">${escHtml(rs.dfs_engine)}</strong></span>` : ''}
+          ${rs?.max_nodes ? `<span class="bg-gray-800 px-2 py-0.5 rounded text-gray-300 border border-gray-700">Target: <strong class="text-gray-200">${rs.max_nodes}</strong> nodes</span>` : ''}
+          ${rs?.started_at ? `<span>Started: <span class="text-gray-300">${new Date(rs.started_at).toLocaleString('ko-KR')}</span></span>` : ''}
+          ${duration ? `<span>Duration: <span class="text-gray-300">${duration}</span></span>` : ''}
+        </div>
+      </div>`;
+
+      // ── Current Activity Banner (shown when running) ──
+      const activity = rs?.current_activity;
+      if (activity && rs?.phase !== 'complete') {
+        html += `<div class="rounded-xl border border-yellow-700 bg-yellow-900/20 p-4 mb-6 flex items-center gap-3">
+          <div class="flex-shrink-0 w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-yellow-300">${escHtml(activity.detail || activity.phase || '진행 중')}</div>
+            ${activity.progress ? `<div class="text-xs text-yellow-500 mt-0.5">Progress: ${escHtml(activity.progress)}</div>` : ''}
+          </div>
+          ${activity.node_id ? `<span class="text-xs font-mono bg-yellow-900/50 px-2 py-1 rounded text-yellow-400 border border-yellow-700">${escHtml(activity.node_id)}</span>` : ''}
+        </div>`
+      }
+
+      // ── Stat Cards ──
+      html += `<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;" class="mb-6">`;
+
+      const cards = [
+        { label: 'Best Score', value: bestScore != null ? bestScore.toFixed(3) : '-', sub: bestNode || '', color: 'text-amber-400', icon: '&#9733;' },
+        { label: 'Avg Score', value: avgScore != null ? avgScore.toFixed(3) : '-', sub: `${scores.length}개 평가됨`, color: 'text-blue-400', icon: '&#9679;' },
+        { label: '노드', value: `${nodesCompleted} / ${total}`, sub: `완료 / 전체`, color: 'text-green-400', icon: '&#9632;' },
+        { label: 'Max Depth', value: maxDepth, sub: `트리 깊이`, color: 'text-purple-400', icon: '&#9650;' },
+      ];
+
+      for (const c of cards) {
+        html += `<div class="rounded-xl border border-gray-700 p-4" style="background:#0f172a;">
+          <div class="text-xs text-gray-500 mb-2 flex items-center gap-1.5">
+            <span class="${c.color}">${c.icon}</span> ${c.label}
+          </div>
+          <div class="text-2xl font-bold ${c.color} mb-0.5">${c.value}</div>
+          <div class="text-xs text-gray-500">${c.sub}</div>
+        </div>`;
+      }
+      html += `</div>`;
+
+      // ── Node Status Breakdown ──
+      html += `<div class="rounded-xl border border-gray-700 p-5 mb-6" style="background:#0f172a;">
+        <div class="text-sm font-semibold text-gray-300 mb-3">Node Status</div>
+        <div class="flex items-center gap-2 mb-3" style="height:24px; border-radius:6px; overflow:hidden; background:#1e293b;">`;
+
+      const barTotal = total || 1;
+      if (expanded > 0) html += `<div style="width:${(expanded/barTotal)*100}%; height:100%; background:#16a34a;" title="expanded: ${expanded}"></div>`;
+      if (pending > 0) html += `<div style="width:${(pending/barTotal)*100}%; height:100%; background:#2563eb;" title="pending: ${pending}"></div>`;
+      if (leaf > 0) html += `<div style="width:${(leaf/barTotal)*100}%; height:100%; background:#7c3aed;" title="leaf: ${leaf}"></div>`;
+      if (pruned > 0) html += `<div style="width:${(pruned/barTotal)*100}%; height:100%; background:#dc2626;" title="pruned: ${pruned}"></div>`;
+
+      html += `</div>
+        <div class="flex flex-wrap gap-4 text-xs">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#16a34a;"></span> Expanded <strong class="text-gray-200">${expanded}</strong></span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#2563eb;"></span> Pending <strong class="text-gray-200">${pending}</strong></span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#7c3aed;"></span> Leaf <strong class="text-gray-200">${leaf}</strong></span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#dc2626;"></span> Pruned <strong class="text-gray-200">${pruned}</strong></span>
+        </div>
+      </div>`;
+
+      // ── Score Distribution ──
+      if (scores.length > 0) {
+        const buckets = [0,0,0,0,0]; // 0-0.2, 0.2-0.4, 0.4-0.6, 0.6-0.8, 0.8-1.0
+        for (const s of scores) {
+          const bi = Math.min(4, Math.floor(s * 5));
+          buckets[bi]++;
+        }
+        const maxBucket = Math.max(1, ...buckets);
+        const bucketLabels = ['0-.2', '.2-.4', '.4-.6', '.6-.8', '.8-1'];
+        const bucketColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#10b981'];
+
+        html += `<div class="rounded-xl border border-gray-700 p-5 mb-6" style="background:#0f172a;">
+          <div class="text-sm font-semibold text-gray-300 mb-3">Score Distribution</div>
+          <div class="flex items-end gap-2" style="height:80px;">`;
+        for (let i = 0; i < 5; i++) {
+          const h = Math.max(4, (buckets[i] / maxBucket) * 72);
+          html += `<div class="flex-1 flex flex-col items-center justify-end gap-1">
+            <span class="text-xs text-gray-400 font-mono">${buckets[i]}</span>
+            <div style="width:100%; height:${h}px; background:${bucketColors[i]}; border-radius:4px 4px 0 0; opacity:0.8;"></div>
+            <span class="text-xs text-gray-500">${bucketLabels[i]}</span>
+          </div>`;
+        }
+        html += `</div></div>`;
+      }
+
+      // ── Best Path ──
+      if (bestPath.length > 0) {
+        html += `<div class="rounded-xl border border-gray-700 p-5 mb-6" style="background:#0f172a;">
+          <div class="text-sm font-semibold text-gray-300 mb-3">Best Path <span class="text-amber-400">&#9733;</span></div>
+          <div class="space-y-2">`;
+        for (let i = 0; i < bestPath.length; i++) {
+          const id = bestPath[i];
+          const node = nodes[id];
+          if (!node) continue;
+          const score = node.composite_score != null ? node.composite_score.toFixed(3) : '-';
+          const scoreColor = node.composite_score != null
+            ? (node.composite_score > 0.7 ? 'text-green-400' : node.composite_score >= 0.3 ? 'text-yellow-400' : 'text-red-400')
+            : 'text-gray-500';
+          const arrow = i < bestPath.length - 1 ? `<div class="text-gray-600 text-xs pl-6">|</div>` : '';
+          html += `<div class="flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2 hover:bg-gray-800 transition-colors" onclick="openNode('${id}')">
+            <span class="text-xs font-mono text-indigo-400 w-10 flex-shrink-0">${escHtml(id)}</span>
+            <span class="flex-1 text-sm text-gray-200 truncate">${escHtml(node.title || '')}</span>
+            <span class="${scoreColor} text-sm font-mono font-semibold">${score}</span>
+          </div>${arrow}`;
+        }
+        html += `</div></div>`;
+      }
+
+      // ── Phase Timeline ──
+      const timings = rs?.phase_timings;
+      if (timings && Object.keys(timings).length > 0) {
+        const phaseNames = { research: '리서치', world_rules: '세계관', characters: '캐릭터', init_tree: '트리 초기화', dfs: 'DFS 탐색', deepen: '심화', report: '리포트' };
+        const phaseColors = { research: '#6366f1', world_rules: '#8b5cf6', characters: '#a855f7', init_tree: '#ec4899', dfs: '#f59e0b', deepen: '#10b981', report: '#06b6d4' };
+
+        // Calculate durations
+        const phaseDurations = [];
+        for (const [key, t] of Object.entries(timings)) {
+          if (t.started_at) {
+            const start = new Date(t.started_at);
+            const end = t.ended_at ? new Date(t.ended_at) : new Date();
+            const ms = end - start;
+            const secs = Math.round(ms / 1000);
+            const mins = Math.floor(secs / 60);
+            const remSecs = secs % 60;
+            phaseDurations.push({ key, label: phaseNames[key] || key, secs, display: mins > 0 ? `${mins}m ${remSecs}s` : `${secs}s`, color: phaseColors[key] || '#6b7280', running: !t.ended_at });
+          }
+        }
+        const maxSecs = Math.max(1, ...phaseDurations.map(p => p.secs));
+
+        html += `<div class="rounded-xl border border-gray-700 p-5 mb-6" style="background:#0f172a;">
+          <div class="text-sm font-semibold text-gray-300 mb-3">Phase Timeline</div>
+          <div class="space-y-2">`;
+        for (const p of phaseDurations) {
+          const pct = Math.max(2, (p.secs / maxSecs) * 100);
+          html += `<div class="flex items-center gap-3">
+            <span class="text-xs text-gray-400 w-20 text-right flex-shrink-0">${escHtml(p.label)}</span>
+            <div class="flex-1 h-5 rounded" style="background:#1e293b;">
+              <div class="h-full rounded flex items-center px-2 text-xs font-mono text-white ${p.running ? 'animate-pulse' : ''}" style="width:${pct}%; background:${p.color}; min-width: fit-content;">
+                ${escHtml(p.display)}${p.running ? ' ⏳' : ''}
+              </div>
+            </div>
+          </div>`;
+        }
+        html += `</div></div>`;
+      }
+
+      // ── Simulation Details Table ──
+      html += `<div class="rounded-xl border border-gray-700 p-5" style="background:#0f172a;">
+        <div class="text-sm font-semibold text-gray-300 mb-3">Details</div>
+        <table class="w-full text-sm" style="border-collapse:collapse;">`;
+
+      const details = [
+        ['Sim ID', idx.sim_id || '-'],
+        ['DFS Engine', rs?.dfs_engine || '-'],
+        ['Phase', phaseLabel],
+        ['Duration', duration || '-'],
+        ['Tree Growth', `${nodesCompleted} completed / ${total} total (target: ${rs?.max_nodes || idx.max_depth || '-'})`],
+        ['Max Depth', `${maxDepth} (limit: ${idx.max_depth || '-'})`],
+        ['Best Node', bestNode ? `${bestNode} (${bestScore?.toFixed(3) || '-'})` : '-'],
+        ['Avg Score', avgScore != null ? avgScore.toFixed(3) : '-'],
+      ];
+
+      for (const [label, value] of details) {
+        html += `<tr class="border-b border-gray-800">
+          <td class="py-2 pr-4 text-gray-500 whitespace-nowrap">${label}</td>
+          <td class="py-2 text-gray-200">${escHtml(String(value))}</td>
+        </tr>`;
+      }
+      html += `</table></div>`;
+
+      document.getElementById('overview').innerHTML = html;
+      state.activeNodeId = null;
+      state.activeDocPath = null;
+      highlightActive();
+    }
+
+    function openNode(id, skipPush) {
+      closeMobileSidebar();
+      state.activeNodeId = id;
+      state.activeDocPath = null;
+      highlightActive();
+      if (!skipPush) pushDeepLink('node', id);
+
+      const node = state.index?.nodes?.[id];
+      if (!node) return;
+
+      const filePath = node.path + '/node.md';
+      const content = state.files[filePath];
+
+      document.getElementById('welcome').classList.add('hidden');
+      document.getElementById('overview').classList.add('hidden');
+      const mdView = document.getElementById('md-view');
+      mdView.classList.remove('hidden');
+
+      // Node metadata header
+      let header = `<div class="rounded-xl border border-gray-700 p-4 mb-4" style="background:#0f172a;">
+        <div class="flex items-center gap-2 flex-wrap mb-2">
+          <span class="text-xs font-mono text-indigo-400 bg-indigo-900/30 px-2 py-0.5 rounded">${escHtml(id)}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full ${node.status === 'expanded' ? 'bg-green-900 text-green-300' : node.status === 'pruned' ? 'bg-red-900 text-red-300' : 'bg-gray-800 text-gray-400'}">${escHtml(node.status || 'unknown')}</span>
+          <span class="text-xs text-gray-500">Depth: ${node.depth ?? '-'}</span>
+          ${node.parent ? `<span class="text-xs text-gray-500">Parent: <span class="text-gray-400 cursor-pointer hover:text-indigo-300" onclick="openNode('${node.parent}')">${escHtml(node.parent)}</span></span>` : ''}
+          ${node.composite_score != null ? `<span class="text-xs font-semibold ${node.composite_score > 0.7 ? 'text-green-400' : node.composite_score >= 0.3 ? 'text-yellow-400' : 'text-red-400'}">Score: ${node.composite_score.toFixed(3)}</span>` : ''}
+          ${node.duration_sec != null ? `<span class="text-xs text-gray-500">⏱ ${Math.floor(node.duration_sec/60)}m${node.duration_sec%60}s</span>` : ''}
+          ${node.chars != null ? `<span class="text-xs text-gray-500">📝 ${node.chars.toLocaleString()}자</span>` : ''}
+          ${node.cost != null && node.cost !== '0' ? `<span class="text-xs text-gray-500">💰 $${node.cost}</span>` : ''}
+        </div>`;
+
+      if (content) {
+        // Parse tags from markdown
+        const tagMatch = content.match(/^## Tags\s*\n(.+)/m);
+        if (tagMatch) {
+          const tags = tagMatch[1].split(',').map(t => t.trim()).filter(Boolean);
+          header += `<div class="flex gap-1.5 flex-wrap">`;
+          for (const tag of tags) {
+            header += `<span class="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700">#${escHtml(tag)}</span>`;
+          }
+          header += `</div>`;
+        }
+
+        // Parse 6-dimensional scores from markdown
+        const scoreSection = content.match(/## Scores[\s\S]*?\n([\s\S]*?)(?=\n## |\n$)/);
+        if (scoreSection) {
+          const scoreLines = scoreSection[1].match(/(?:CF|FR|EM|DV|PL|FS|Character Fidelity|Audience Resonance|Emergence|Diversity|Plausibility|Foreshadowing)[:\s|]+[\d.]+/gi);
+          if (scoreLines && scoreLines.length > 0) {
+            const scoreLabels = { CF: 'Character Fidelity', FR: 'Audience Resonance', EM: 'Emergence', DV: 'Diversity', PL: 'Plausibility', FS: 'Foreshadowing' };
+            const scoreColors = { CF: '#f59e0b', FR: '#ec4899', EM: '#8b5cf6', DV: '#3b82f6', PL: '#10b981', FS: '#06b6d4' };
+            header += `<div class="mt-3 grid grid-cols-3 gap-2">`;
+            for (const line of scoreLines) {
+              const m = line.match(/(CF|FR|EM|DV|PL|FS|Character Fidelity|Audience Resonance|Emergence|Diversity|Plausibility|Foreshadowing)[:\s|]+([\d.]+)/i);
+              if (m) {
+                const abbr = m[1].length <= 2 ? m[1].toUpperCase() : Object.entries(scoreLabels).find(([,v]) => v.toLowerCase() === m[1].toLowerCase())?.[0] || m[1];
+                const val = parseFloat(m[2]);
+                const label = scoreLabels[abbr] || abbr;
+                const color = scoreColors[abbr] || '#6b7280';
+                const pct = Math.min(100, val * 100);
+                header += `<div class="text-xs">
+                  <div class="flex justify-between mb-0.5"><span class="text-gray-400">${escHtml(label)}</span><span style="color:${color}" class="font-mono font-semibold">${val.toFixed(2)}</span></div>
+                  <div class="h-1.5 rounded" style="background:#1e293b;"><div class="h-full rounded" style="width:${pct}%;background:${color};"></div></div>
+                </div>`;
+              }
+            }
+            header += `</div>`;
+          }
+        }
+      }
+
+      header += `</div>`;
+
+      // Breadcrumb navigation (root → ... → parent → current)
+      {
+        const idx = state.index;
+        // Build path from root to current
+        const breadcrumb = [];
+        let cur = id;
+        while (cur) {
+          breadcrumb.unshift(cur);
+          cur = idx.nodes[cur]?.parent || null;
+        }
+
+        if (breadcrumb.length > 1) {
+          let bc = `<div class="flex items-center gap-1 mt-2 mb-1 text-xs overflow-x-auto">`;
+          for (let i = 0; i < breadcrumb.length; i++) {
+            const bid = breadcrumb[i];
+            const isLast = i === breadcrumb.length - 1;
+            const bNode = idx.nodes[bid];
+            const bTitle = bNode?.title ? ' ' + bNode.title.slice(0, 25) + (bNode.title.length > 25 ? '…' : '') : '';
+            if (isLast) {
+              bc += `<span class="px-2 py-0.5 rounded bg-indigo-900/40 text-indigo-300 font-semibold">${escHtml(bid)}<span class="text-indigo-400/70 font-normal ml-1">${escHtml(bTitle)}</span></span>`;
+            } else {
+              bc += `<span class="px-2 py-0.5 rounded text-gray-400 hover:text-indigo-300 hover:bg-gray-800 cursor-pointer transition-colors" onclick="openNode('${bid}')">${escHtml(bid)}<span class="text-gray-500 ml-1">${escHtml(bTitle)}</span></span>`;
+              bc += `<span class="text-gray-600">›</span>`;
+            }
+          }
+          bc += `</div>`;
+          header += bc;
+        }
+
+        // Children cards
+        const children = Object.entries(idx?.nodes || {})
+          .filter(([, n]) => n.parent === id)
+          .sort(([a], [b]) => a.localeCompare(b));
+
+        if (children.length > 0) {
+          let cards = `<div class="mt-3 mb-1"><span class="text-xs text-gray-500 font-medium">하위 분기 (${children.length})</span></div>`;
+          cards += `<div class="grid gap-2 mb-3" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">`;
+          for (const [cid, cNode] of children) {
+            const isPruned = cNode.status === 'pruned';
+            const score = cNode.composite_score;
+            const scoreColor = score > 0.7 ? '#10b981' : score >= 0.3 ? '#eab308' : score != null ? '#ef4444' : '#6b7280';
+            const borderColor = isPruned ? '#374151' : scoreColor;
+            const title = cNode.title ? cNode.title.slice(0, 40) + (cNode.title.length > 40 ? '…' : '') : cid;
+            cards += `<div onclick="openNode('${cid}')" class="rounded-lg border p-3 cursor-pointer hover:border-indigo-500 transition-all ${isPruned ? 'opacity-40' : ''}" style="background:#0f172a; border-color:${borderColor};">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-mono text-indigo-400">${escHtml(cid)}</span>
+                ${score != null ? `<span class="text-xs font-semibold" style="color:${scoreColor}">${score.toFixed(2)}</span>` : ''}
+              </div>
+              <p class="text-xs text-gray-300 leading-snug">${isPruned ? '<span class="text-red-400 mr-1">✕</span>' : ''}${escHtml(title)}</p>
+            </div>`;
+          }
+          cards += `</div>`;
+          header += cards;
+        }
+      }
+
+      // Node stats: character count from narrative
+      if (content) {
+        const narrativeMatch = content.match(/## Narrative\s*\n([\s\S]*?)(?=\n## |\n$)/);
+        const narrativeText = narrativeMatch ? narrativeMatch[1].trim() : '';
+        const charCount = narrativeText.length;
+        const keyEventsMatch = content.match(/## Key Events\s*\n([\s\S]*?)(?=\n## )/);
+        const eventCount = keyEventsMatch ? (keyEventsMatch[1].match(/^\d+\./gm) || []).length : 0;
+
+        if (charCount > 0 || eventCount > 0) {
+          header += `<div class="flex gap-4 mt-3 mb-4 text-xs">`;
+          if (charCount > 0) header += `<span class="bg-gray-800 text-gray-300 px-2.5 py-1 rounded border border-gray-700">📝 내러티브 ${charCount.toLocaleString()}자</span>`;
+          if (eventCount > 0) header += `<span class="bg-gray-800 text-gray-300 px-2.5 py-1 rounded border border-gray-700">⚡ 핵심 이벤트 ${eventCount}개</span>`;
+          header += `</div>`;
+        }
+      }
+
+      // Render markdown content
+      let body = '';
+      if (content) {
+        body = DOMPurify.sanitize(marked.parse(content));
+      } else {
+        body = `<div class="text-gray-500 text-sm italic">
+            <p class="mt-2">(아직 시뮬레이션 안 됨) — node.md 파일이 없습니다.</p>
+          </div>`;
+      }
+
+      // Image gallery — 첫 번째 h1 제목 바로 아래에 삽입
+      const imgGalleryId = 'node-image-gallery-' + id;
+      const imageSection = `<div id="${imgGalleryId}"></div>`;
+
+      // body의 첫 번째 </h1> 뒤에 갤러리 삽입
+      const h1End = body.indexOf('</h1>');
+      if (h1End !== -1) {
+        body = body.slice(0, h1End + 5) + imageSection + body.slice(h1End + 5);
+      } else {
+        body = imageSection + body;
+      }
+
+      mdView.innerHTML = header + body;
+
+      // Fetch node images asynchronously
+      if (state.index?.sim_id) {
+        fetch('/api/images/' + state.index.sim_id + '/' + node.path)
+          .then(r => r.ok ? r.json() : [])
+          .then(images => {
+            const gallery = document.getElementById(imgGalleryId);
+            if (!gallery || images.length === 0) return;
+            gallery.innerHTML = `
+              <div class="rounded-xl border border-gray-700 p-4 mb-4" style="background:#0f172a;">
+                <h3 class="text-sm font-semibold text-gray-300 mb-3">🎨 생성된 이미지 (${images.length})</h3>
+                <div class="grid grid-cols-2 gap-3">
+                  ${images.map(img => `
+                    <div class="rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
+                      <img src="/data/${state.index.sim_id}/${node.path}/images/${img}"
+                           alt="${img}" class="w-full cursor-pointer hover:opacity-90 transition-opacity"
+                           onclick="window.open(this.src, '_blank')" />
+                      <div class="px-2 py-1.5 text-xs text-gray-500 truncate">${img}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>`;
+          })
+          .catch(() => {});
+      }
+    }
+
+    function openDoc(filename, skipPush) {
+      state.activeDocPath = filename;
+      state.activeNodeId = null;
+      highlightActive();
+      if (!skipPush) pushDeepLink('doc', filename);
+
+      const content = state.files[filename];
+      document.getElementById('welcome').classList.add('hidden');
+      document.getElementById('overview').classList.add('hidden');
+      const mdView = document.getElementById('md-view');
+      mdView.classList.remove('hidden');
+
+      if (content) {
+        mdView.innerHTML = DOMPurify.sanitize(marked.parse(content));
+      } else {
+        mdView.innerHTML = `<p class="text-gray-500 italic">파일을 불러올 수 없습니다: ${escHtml(filename)}</p>`;
+      }
+    }
+
+    // ─── SVG Tree Visualization ───────────────────────────────────────────────
+
+    const SVG_NODE_W  = 180;
+    const SVG_NODE_H  = 60;
+    const SVG_LEVEL_H = 110;
+    const SVG_GAP     = 24;
+
+    // Build children map from index
+    function buildChildrenMap() {
+      const idx = state.index;
+      const children = {};
+      for (const [id, node] of Object.entries(idx.nodes || {})) {
+        const parent = node.parent;
+        if (!children[parent]) children[parent] = [];
+        children[parent].push(id);
+      }
+      // Sort children by ID for deterministic layout
+      for (const k in children) children[k].sort();
+      return children;
+    }
+
+    // Recursive layout: returns { x (center), subtreeWidth }
+    function layoutNode(id, depth, xStart, childrenMap, layouts) {
+      const kids = childrenMap[id] || [];
+
+      if (kids.length === 0) {
+        layouts[id] = { x: xStart + SVG_NODE_W / 2, y: depth * SVG_LEVEL_H };
+        return { centerX: xStart + SVG_NODE_W / 2, subtreeWidth: SVG_NODE_W };
+      }
+
+      let cursor = xStart;
+      let totalWidth = 0;
+      const childCenters = [];
+
+      for (const child of kids) {
+        const result = layoutNode(child, depth + 1, cursor, childrenMap, layouts);
+        childCenters.push(result.centerX);
+        cursor += result.subtreeWidth + SVG_GAP;
+        totalWidth += result.subtreeWidth + SVG_GAP;
+      }
+      totalWidth -= SVG_GAP; // remove last gap
+
+      const leftmost  = childCenters[0];
+      const rightmost = childCenters[childCenters.length - 1];
+      const centerX   = (leftmost + rightmost) / 2;
+
+      layouts[id] = { x: centerX, y: depth * SVG_LEVEL_H };
+
+      return { centerX, subtreeWidth: Math.max(totalWidth, SVG_NODE_W) };
+    }
+
+    function scoreColors(score) {
+      if (score === null || score === undefined) {
+        return { fill: '#1e293b', stroke: '#334155', text: '#94a3b8' };
+      }
+      if (score > 0.7)  return { fill: '#052e16', stroke: '#16a34a', text: '#4ade80' };
+      if (score >= 0.3) return { fill: '#1c1407', stroke: '#b45309', text: '#fbbf24' };
+      return { fill: '#1f0a0a', stroke: '#b91c1c', text: '#f87171' };
+    }
+
+    function renderSvgTree() {
+      const idx = state.index;
+      if (!idx || !idx.nodes) return;
+
+      const bestSet = new Set(idx.best_path || []);
+      const childrenMap = buildChildrenMap();
+      const layouts = {};
+
+      // Find root(s)
+      const roots = (childrenMap[null] || []);
+      if (roots.length === 0) return;
+
+      // Layout all roots side by side
+      let cursor = SVG_GAP;
+      for (const root of roots) {
+        const result = layoutNode(root, 0, cursor, childrenMap, layouts);
+        cursor += result.subtreeWidth + SVG_GAP * 2;
+      }
+
+      state.svgLayouts = layouts;
+
+      // Calculate canvas dimensions
+      let maxX = 0, maxY = 0;
+      for (const { x, y } of Object.values(layouts)) {
+        maxX = Math.max(maxX, x + SVG_NODE_W / 2 + SVG_GAP);
+        maxY = Math.max(maxY, y + SVG_NODE_H + SVG_GAP);
+      }
+
+      const svgEl = document.getElementById('tree-svg');
+      const panGroup = document.getElementById('svg-pan-group');
+      panGroup.innerHTML = '';
+
+      svgEl.setAttribute('width', '100%');
+      svgEl.setAttribute('height', '100%');
+      svgEl.style.width  = '100%';
+      svgEl.style.height = '100%';
+
+      // ── Draw edges first (behind nodes) ─────────────────────────────────
+      for (const [id, layout] of Object.entries(layouts)) {
+        const kids = childrenMap[id] || [];
+        for (const child of kids) {
+          const cl = layouts[child];
+          if (!cl) continue;
+
+          const parentInBest = bestSet.has(id);
+          const childInBest  = bestSet.has(child);
+          const isBestEdge   = parentInBest && childInBest;
+
+          const x1 = layout.x;
+          const y1 = layout.y + SVG_NODE_H;
+          const x2 = cl.x;
+          const y2 = cl.y;
+
+          // Bezier curve for organic feel
+          const cy1 = y1 + (y2 - y1) * 0.4;
+          const cy2 = y2 - (y2 - y1) * 0.4;
+
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${cy1}, ${x2} ${cy2}, ${x2} ${y2}`);
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', isBestEdge ? '#f59e0b' : '#334155');
+          path.setAttribute('stroke-width', isBestEdge ? '2' : '1.5');
+          if (isBestEdge) {
+            path.setAttribute('stroke-opacity', '0.9');
+          } else {
+            path.setAttribute('stroke-opacity', '0.5');
+          }
+          panGroup.appendChild(path);
+        }
+      }
+
+      // ── Draw nodes ───────────────────────────────────────────────────────
+      for (const [id, layout] of Object.entries(layouts)) {
+        const node = idx.nodes[id];
+        if (!node) continue;
+
+        const isPruned   = node.status === 'pruned';
+        const inBest     = bestSet.has(id);
+        const isSelected = state.selectedTreeNodeId === id;
+        const score      = node.composite_score ?? null;
+        const colors     = scoreColors(isPruned ? null : score);
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'svg-node-group');
+        g.setAttribute('data-node-id', id);
+        if (isPruned) g.setAttribute('opacity', '0.45');
+
+        const nx = layout.x - SVG_NODE_W / 2;
+        const ny = layout.y;
+
+        // Outer glow rect (for selected/best)
+        if (isSelected || (inBest && !isPruned)) {
+          const glowRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          glowRect.setAttribute('x', nx - 3);
+          glowRect.setAttribute('y', ny - 3);
+          glowRect.setAttribute('width', SVG_NODE_W + 6);
+          glowRect.setAttribute('height', SVG_NODE_H + 6);
+          glowRect.setAttribute('rx', '11');
+          glowRect.setAttribute('fill', 'none');
+          glowRect.setAttribute('stroke', isSelected ? '#6366f1' : '#f59e0b');
+          glowRect.setAttribute('stroke-width', '1');
+          glowRect.setAttribute('opacity', '0.4');
+          g.appendChild(glowRect);
+        }
+
+        // Main rect
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', nx);
+        rect.setAttribute('y', ny);
+        rect.setAttribute('width', SVG_NODE_W);
+        rect.setAttribute('height', SVG_NODE_H);
+        rect.setAttribute('rx', '8');
+        rect.setAttribute('fill', isPruned ? '#111827' : colors.fill);
+        rect.setAttribute('stroke', isSelected ? '#6366f1' : inBest && !isPruned ? '#f59e0b' : colors.stroke);
+        rect.setAttribute('stroke-width', isSelected || inBest ? '2' : '1');
+        if (isPruned) {
+          rect.setAttribute('stroke-dasharray', '4 3');
+          rect.setAttribute('stroke', '#374151');
+        }
+        g.appendChild(rect);
+
+        // Node ID label (top-left chip)
+        const idLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        idLabel.setAttribute('x', nx + 10);
+        idLabel.setAttribute('y', ny + 15);
+        idLabel.setAttribute('font-size', '9');
+        idLabel.setAttribute('font-family', 'ui-monospace, monospace');
+        idLabel.setAttribute('fill', isPruned ? '#4b5563' : inBest ? '#f59e0b' : '#6366f1');
+        idLabel.setAttribute('font-weight', '600');
+        idLabel.textContent = id;
+        g.appendChild(idLabel);
+
+        // Best path star
+        if (inBest && !isPruned) {
+          const star = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          star.setAttribute('x', nx + SVG_NODE_W - 12);
+          star.setAttribute('y', ny + 15);
+          star.setAttribute('font-size', '10');
+          star.setAttribute('fill', '#f59e0b');
+          star.setAttribute('text-anchor', 'middle');
+          star.textContent = '★';
+          g.appendChild(star);
+        }
+
+        // Pruned X
+        if (isPruned) {
+          const xMark = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          xMark.setAttribute('x', nx + SVG_NODE_W - 12);
+          xMark.setAttribute('y', ny + 15);
+          xMark.setAttribute('font-size', '9');
+          xMark.setAttribute('fill', '#ef4444');
+          xMark.setAttribute('text-anchor', 'middle');
+          xMark.textContent = '✕';
+          g.appendChild(xMark);
+        }
+
+        // Title text (truncated)
+        const title = node.title || id;
+        const maxChars = 22;
+        const displayTitle = title.length > maxChars ? title.slice(0, maxChars) + '…' : title;
+
+        const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        titleText.setAttribute('x', nx + SVG_NODE_W / 2);
+        titleText.setAttribute('y', ny + 36);
+        titleText.setAttribute('font-size', '11');
+        titleText.setAttribute('font-family', 'system-ui, sans-serif');
+        titleText.setAttribute('fill', isPruned ? '#6b7280' : '#e2e8f0');
+        titleText.setAttribute('text-anchor', 'middle');
+        titleText.setAttribute('font-weight', '500');
+        if (isPruned) titleText.setAttribute('text-decoration', 'line-through');
+        titleText.textContent = displayTitle;
+        g.appendChild(titleText);
+
+        // Score badge
+        if (score !== null && !isPruned) {
+          const scoreText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          scoreText.setAttribute('x', nx + SVG_NODE_W / 2);
+          scoreText.setAttribute('y', ny + 52);
+          scoreText.setAttribute('font-size', '10');
+          scoreText.setAttribute('font-family', 'ui-monospace, monospace');
+          scoreText.setAttribute('fill', colors.text);
+          scoreText.setAttribute('text-anchor', 'middle');
+          scoreText.textContent = score.toFixed(2);
+          g.appendChild(scoreText);
+        }
+
+        // Click handler
+        g.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectTreeNode(id);
+        });
+
+        // Double-click: switch to doc mode and open node
+        g.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
+          if (!isPruned) {
+            setViewMode('doc');
+            openNode(id);
+          }
+        });
+
+        panGroup.appendChild(g);
+      }
+
+      // Apply current transform
+      applyPanZoom();
+
+      // Center the tree on first render
+      if (!state._treeInitialized) {
+        state._treeInitialized = true;
+        centerTree(maxX, maxY);
+      }
+    }
+
+    function centerTree(contentW, contentH) {
+      const container = document.getElementById('tree-view-container');
+      const vw = container.clientWidth;
+      const vh = container.clientHeight;
+
+      // Choose scale to fit, but not too zoomed out
+      const scaleX = vw / (contentW + SVG_GAP * 2);
+      const scaleY = (vh - 80) / (contentH + SVG_GAP * 2);
+      const scale = Math.min(Math.min(scaleX, scaleY), 1.2);
+
+      const scaledW = contentW * scale;
+      const scaledH = contentH * scale;
+
+      state.svgTransform = {
+        x: (vw - scaledW) / 2,
+        y: Math.max(20, (vh - scaledH) / 4),
+        scale,
+      };
+      applyPanZoom();
+    }
+
+    function applyPanZoom() {
+      const { x, y, scale } = state.svgTransform;
+      const group = document.getElementById('svg-pan-group');
+      group.setAttribute('transform', `translate(${x}, ${y}) scale(${scale})`);
+    }
+
+    function treeZoom(factor) {
+      const container = document.getElementById('tree-view-container');
+      const cx = container.clientWidth  / 2;
+      const cy = container.clientHeight / 2;
+      const { x, y, scale } = state.svgTransform;
+      const newScale = Math.min(Math.max(scale * factor, 0.15), 4);
+      // Zoom toward center of viewport
+      state.svgTransform = {
+        x: cx - (cx - x) * (newScale / scale),
+        y: cy - (cy - y) * (newScale / scale),
+        scale: newScale,
+      };
+      applyPanZoom();
+    }
+
+    function treeResetView() {
+      state._treeInitialized = false;
+      renderSvgTree();
+    }
+
+    // ── Pan events ─────────────────────────────────────────────────────────
+    function initPanZoom() {
+      const container = document.getElementById('tree-view-container');
+
+      container.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        // Don't start pan if clicking on a node
+        if (e.target.closest('.svg-node-group')) return;
+        state.treePanStart = { mx: e.clientX, my: e.clientY, ox: state.svgTransform.x, oy: state.svgTransform.y };
+        container.classList.add('grabbing');
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!state.treePanStart) return;
+        const dx = e.clientX - state.treePanStart.mx;
+        const dy = e.clientY - state.treePanStart.my;
+        state.svgTransform.x = state.treePanStart.ox + dx;
+        state.svgTransform.y = state.treePanStart.oy + dy;
+        applyPanZoom();
+      });
+
+      window.addEventListener('mouseup', () => {
+        state.treePanStart = null;
+        container.classList.remove('grabbing');
+      });
+
+      // Wheel zoom
+      container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = container.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        const { x, y, scale } = state.svgTransform;
+        const newScale = Math.min(Math.max(scale * factor, 0.15), 4);
+        state.svgTransform = {
+          x: mx - (mx - x) * (newScale / scale),
+          y: my - (my - y) * (newScale / scale),
+          scale: newScale,
+        };
+        applyPanZoom();
+      }, { passive: false });
+
+      // Click on empty SVG background → deselect
+      container.addEventListener('click', (e) => {
+        if (!e.target.closest('.svg-node-group')) {
+          deselectTreeNode();
+        }
+      });
+    }
+
+    // ── Node selection & info panel ────────────────────────────────────────
+    function selectTreeNode(id) {
+      state.selectedTreeNodeId = id;
+      showTreeDocPanel(id);
+      renderSvgTree();
+    }
+
+    function deselectTreeNode() {
+      state.selectedTreeNodeId = null;
+      closeTreeDocPanel();
+      renderSvgTree();
+    }
+
+    function showTreeDocPanel(id) {
+      const node = state.index?.nodes?.[id];
+      if (!node) return;
+      const filePath = node.path + '/node.md';
+      const content = state.files[filePath];
+
+      document.getElementById('tree-doc-panel-title').textContent = id + (node.title ? ' — ' + node.title : '');
+
+      const panelBody = document.getElementById('tree-doc-panel-body');
+
+      // 메타데이터 헤더 (문서 보기 모드와 동일)
+      let metaHeader = `<div class="rounded-xl border border-gray-700 p-4 mb-4" style="background:#0f172a;">
+        <div class="flex items-center gap-2 flex-wrap mb-2">
+          <span class="text-xs font-mono text-indigo-400 bg-indigo-900/30 px-2 py-0.5 rounded">${escHtml(id)}</span>
+          <span class="text-xs px-2 py-0.5 rounded-full ${node.status === 'expanded' ? 'bg-green-900 text-green-300' : node.status === 'pruned' ? 'bg-red-900 text-red-300' : 'bg-gray-800 text-gray-400'}">${escHtml(node.status || 'unknown')}</span>
+          <span class="text-xs text-gray-500">Depth: ${node.depth ?? '-'}</span>
+          ${node.parent ? `<span class="text-xs text-gray-500">Parent: <span class="text-gray-400">${escHtml(node.parent)}</span></span>` : ''}
+          ${node.composite_score != null ? `<span class="text-xs font-semibold ${node.composite_score > 0.7 ? 'text-green-400' : node.composite_score >= 0.3 ? 'text-yellow-400' : 'text-red-400'}">Score: ${node.composite_score.toFixed(3)}</span>` : ''}
+          ${node.duration_sec != null ? `<span class="text-xs text-gray-500">⏱ ${Math.floor(node.duration_sec/60)}m${node.duration_sec%60}s</span>` : ''}
+          ${node.chars != null ? `<span class="text-xs text-gray-500">📝 ${node.chars.toLocaleString()}자</span>` : ''}
+          ${node.cost != null && node.cost !== '0' ? `<span class="text-xs text-gray-500">💰 $${node.cost}</span>` : ''}
+        </div>
+      </div>`;
+
+      if (content) {
+        let html = DOMPurify.sanitize(marked.parse(content));
+        // 이미지 갤러리 삽입
+        const imgId = 'tree-panel-img-' + id;
+        const h1End = html.indexOf('</h1>');
+        if (h1End !== -1) {
+          html = html.slice(0, h1End + 5) + `<div id="${imgId}"></div>` + html.slice(h1End + 5);
+        } else {
+          html = `<div id="${imgId}"></div>` + html;
+        }
+        panelBody.innerHTML = metaHeader + html;
+        // 이미지 비동기 로드
+        if (state.index?.sim_id) {
+          fetch('/api/images/' + state.index.sim_id + '/' + node.path)
+            .then(r => r.ok ? r.json() : [])
+            .then(images => {
+              const el = document.getElementById(imgId);
+              if (!el || images.length === 0) return;
+              el.innerHTML = `<div class="grid grid-cols-2 gap-2 my-3">${images.map(img =>
+                `<img src="/data/${state.index.sim_id}/${node.path}/images/${img}" alt="${img}" class="rounded-lg border border-gray-700 cursor-pointer hover:opacity-90" onclick="window.open(this.src,'_blank')" />`
+              ).join('')}</div>`;
+            }).catch(() => {});
+        }
+      } else {
+        panelBody.innerHTML = metaHeader + '<p class="text-gray-500 italic text-sm">(node.md 파일 없음)</p>';
+      }
+
+      document.getElementById('tree-doc-panel').classList.add('visible');
+    }
+
+    function closeTreeDocPanel() {
+      document.getElementById('tree-doc-panel').classList.remove('visible');
+    }
+
+    function showInfoPanel(id) {
+      const idx = state.index;
+      const node = idx?.nodes?.[id];
+      if (!node) return;
+
+      const score = node.composite_score ?? null;
+      const isPruned = node.status === 'pruned';
+      const bestSet = new Set(idx.best_path || []);
+      const inBest = bestSet.has(id);
+
+      document.getElementById('panel-node-id').textContent = id;
+
+      // Score badge
+      const scoreBadge = document.getElementById('panel-score-badge');
+      if (score !== null) {
+        scoreBadge.textContent = score.toFixed(2);
+        scoreBadge.className = 'text-xs px-2 py-0.5 rounded-full font-semibold ' + (
+          score > 0.7  ? 'bg-green-900 text-green-300' :
+          score >= 0.3 ? 'bg-yellow-900 text-yellow-300' :
+                         'bg-red-900 text-red-300'
+        );
+      } else {
+        scoreBadge.textContent = '';
+        scoreBadge.className = '';
+      }
+
+      // Status badge
+      const statusBadge = document.getElementById('panel-status-badge');
+      if (isPruned) {
+        statusBadge.textContent = '가지치기';
+        statusBadge.className = 'text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-500';
+      } else if (inBest) {
+        statusBadge.textContent = '★ Best Path';
+        statusBadge.className = 'text-xs px-2 py-0.5 rounded-full bg-amber-900 text-amber-300';
+      } else if (node.status === 'leaf') {
+        statusBadge.textContent = '리프';
+        statusBadge.className = 'text-xs px-2 py-0.5 rounded-full bg-blue-900 text-blue-300';
+      } else {
+        statusBadge.textContent = node.status || '';
+        statusBadge.className = 'text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400';
+      }
+
+      document.getElementById('panel-title').textContent = node.title || id;
+
+      // Try to extract narrative preview from node.md
+      const filePath = node.path + '/node.md';
+      const content = state.files[filePath];
+      let narrative = node.narrative || '';
+      if (!narrative && content) {
+        // Extract first paragraph after frontmatter/headers
+        const lines = content.split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('---') && trimmed.length > 20) {
+            narrative = trimmed;
+            break;
+          }
+        }
+      }
+      document.getElementById('panel-narrative').textContent = narrative || '(내러티브 없음)';
+
+      document.getElementById('tree-info-panel').classList.add('visible');
+    }
+
+    function closeInfoPanel() {
+      document.getElementById('tree-info-panel').classList.remove('visible');
+    }
+
+    function panelOpenDoc() {
+      const id = state.selectedTreeNodeId;
+      if (!id) return;
+      setViewMode('doc');
+      openNode(id);
+    }
+
+    // ─── File drop handling ───────────────────────────────────────────────────
+    function toggleDropZone() {
+      const panel = document.getElementById('drop-zone-panel');
+      panel.classList.toggle('hidden');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      document.getElementById('drop-zone').classList.remove('drag-over');
+    }
+
+    async function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').classList.remove('drag-over');
+      const files = Array.from(e.dataTransfer.files);
+      await loadDroppedFiles(files);
+      toggleDropZone();
+    }
+
+    async function handleFileInput(e) {
+      const files = Array.from(e.target.files);
+      await loadDroppedFiles(files);
+      toggleDropZone();
+    }
+
+    async function loadDroppedFiles(files) {
+      const reads = files.map(f => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve({ name: f.name, path: f.webkitRelativePath || f.name, text: e.target.result });
+        reader.readAsText(f);
+      }));
+
+      const results = await Promise.all(reads);
+
+      const indexFile = results.find(r => r.name === 'tree-index.json');
+      if (!indexFile) {
+        alert('tree-index.json 파일을 찾을 수 없습니다. tree-index.json을 포함해서 드롭해주세요.');
+        return;
+      }
+
+      try {
+        state.index = JSON.parse(indexFile.text);
+      } catch (e) {
+        alert('tree-index.json 파싱 실패: ' + e.message);
+        return;
+      }
+
+      state.files = {};
+      for (const r of results) {
+        if (r.name === 'tree-index.json') continue;
+        state.files[r.name] = r.text;
+        if (r.path && r.path !== r.name) {
+          const parts = r.path.split('/');
+          const joined = parts.slice(1).join('/');
+          if (joined) state.files[joined] = r.text;
+          state.files[r.path] = r.text;
+        }
+      }
+
+      // Reset tree state for new data
+      state._treeInitialized = false;
+      state.selectedTreeNodeId = null;
+
+      renderAll();
+    }
+
+    // ─── Utility ─────────────────────────────────────────────────────────────
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ─── Start ───────────────────────────────────────────────────────────────
+    initPanZoom();
+    boot();
+  </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{
+  "topic": "진격의거인 에렌이 땅울림을 하지 않았다면 향후 100년",
+  "summary": "The topic explores a hypothetical scenario in the 'Attack on Titan' universe, specifically focusing on the consequences if Eren Yeager, the series' protagonist, did not execute 'The Rumbling' within the next 100 years. In the original storyline, Eren activates 'The Rumbling' as a drastic measure to protect his homeland, Paradis Island, by unleashing a colossal army of Titans to eradicate threats from the rest of the world. Without this apocalyptic event, the political landscape, both within Paradis and globally, would be dramatically different, focusing on diplomacy, internal strife, and the potential for technological and societal advancement in a world still plagued by Titan threats but not imminent destruction.",
+  "key_characters": [
+    {
+      "name": "Eren Yeager",
+      "role": "Protagonist, Titan Shifter",
+      "description": "Eren is a complex character driven by a desire for freedom and protection of his people. Without initiating 'The Rumbling', his motivations might shift towards finding alternative solutions for peace and security.",
+      "motivations": "To protect Paradis Island from external threats and secure freedom for Eldians."
+    },
+    {
+      "name": "Mikasa Ackerman",
+      "role": "Eren's Protector and Confidant",
+      "description": "Mikasa is fiercely loyal to Eren and often acts as his moral compass. In the absence of 'The Rumbling', she could play a crucial role in guiding Eren towards peaceful strategies.",
+      "motivations": "To ensure Eren's safety and support his decisions, while upholding her own moral values."
+    },
+    {
+      "name": "Armin Arlert",
+      "role": "Strategist and Friend",
+      "description": "Armin is known for his intelligence and strategic mind. Without 'The Rumbling', his diplomatic skills would be essential in creating alliances and negotiating peace.",
+      "motivations": "To find non-violent solutions to conflicts and use his strategic prowess for peace."
+    }
+  ],
+  "key_factions": [
+    {
+      "name": "Paradis Eldians",
+      "stance": "Defensive",
+      "goals": "To protect their island and secure a peaceful future for Eldians.",
+      "resources": "The power of the Titans and military innovations."
+    },
+    {
+      "name": "Marleyan Empire",
+      "stance": "Aggressive",
+      "goals": "To dominate Paradis and control the power of the Titans.",
+      "resources": "A powerful military and international alliances."
+    }
+  ],
+  "world_setting": "The world is a divided and tense environment where Paradis Island is isolated and considered a threat due to its Titan powers. The rest of the world, led by the Marleyan Empire, views Paradis with fear and hostility. Within Paradis, society struggles with internal divisions, debates over how to handle external threats, and the legacy of the Titans.",
+  "conflict_structure": "Core conflicts revolve around the fear and mistrust between Paradis and the rest of the world. Internally, Paradis faces ideological struggles on how to deal with the Titan threat and the external world, balancing the need for security with the desire for peace. Power dynamics are influenced by the possession of Titan abilities and the strategic importance of Paradis in global politics.",
+  "historical_context": "The scenario resembles Cold War dynamics, where the balance of terror maintained by nuclear capabilities mirrors the balance of power maintained by Titans in 'Attack on Titan'. The tension and potential for détente could result in peace or escalation, reflecting real-world conflicts driven by fear and the desire for dominance.",
+  "fan_theories": [
+    "Some fans speculate that without 'The Rumbling', Eren could pursue a path of reconciliation with Marley, potentially leading to a peaceful coexistence.",
+    "Another theory suggests that without the threat of imminent destruction, Paradis might experience a civil war due to differing ideologies on how to deal with the external world."
+  ],
+  "thematic_elements": [
+    "Power and its consequences",
+    "The struggle for freedom",
+    "The fear of the unknown",
+    "Identity and legacy"
+  ],
+  "topic_specific_metrics": [
+    {
+      "name": "Diplomatic Progress",
+      "description": "Measure of how well Paradis Island negotiates peace and understanding with the outside world.",
+      "weight": 0.8
+    },
+    {
+      "name": "Technological Advancement",
+      "description": "Evaluates the progress in technology on Paradis that could help counter threats without resorting to Titans.",
+      "weight": 0.6
+    },
+    {
+      "name": "Internal Stability",
+      "description": "Assessment of political and social stability within Paradis, accounting for factionalism or unity.",
+      "weight": 0.7
+    }
+  ],
+  "sources": [
+    "Attack on Titan manga/anime canon",
+    "Fan forums and discussion threads",
+    "Historical analysis of Cold War strategies"
+  ],
+  "created_at": "2026-03-21T10:09:30.798993+00:00"
+}

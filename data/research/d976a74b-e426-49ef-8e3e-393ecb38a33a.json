@@ -1,0 +1,80 @@
+{
+  "topic": "진격의거인 에렌이 땅울림을 하지 않았다면 향후 100년",
+  "summary": "The scenario in question examines an alternate history where Eren Yeager, the central figure in the anime and manga series 'Attack on Titan,' does not initiate the 'Rumbling' – a cataclysmic event intended to eradicate threats against the island of Paradis and its inhabitants, the Eldians. Within the series, the Rumbling involves awakening countless Colossal Titans embedded within the walls of Paradis to trample the earth, an act that Eren believes would secure his people's future by eliminating external threats. This alternative scenario explores the socio-political repercussions and potential pathways for peace or conflict over the next century without the Rumbling's devastation.",
+  "key_characters": [
+    {
+      "name": "Eren Yeager",
+      "role": "Protagonist",
+      "description": "Eren is the primary protagonist known for his intense desire for freedom and protection of his homeland, Paradis Island. He transforms from a hopeful soldier to a complex leader driven by survivalist ideology.",
+      "motivations": "Protect Paradis and the Eldians from external threats; seek ultimate freedom for his people."
+    },
+    {
+      "name": "Mikasa Ackerman",
+      "role": "Close ally and protector of Eren",
+      "description": "Mikasa is fiercely loyal to Eren, often acting as his protector. She struggles with her identity and the moral implications of Eren's choices.",
+      "motivations": "Protect Eren and find a peaceful resolution to the conflict."
+    },
+    {
+      "name": "Armin Arlert",
+      "role": "Strategist and moral compass",
+      "description": "Armin is a brilliant tactician who often functions as the group's moral compass. He believes in diplomacy and understanding over violence.",
+      "motivations": "Seek peaceful solutions and foster understanding between Paradis and the outside world."
+    }
+  ],
+  "key_factions": [
+    {
+      "name": "Eldians of Paradis",
+      "stance": "Aggrieved defensive",
+      "goals": "Ensure survival and autonomy of their people; defend against external threats.",
+      "resources": "Titan Shifters; military forces; natural defenses of Paradis."
+    },
+    {
+      "name": "Marleyan Empire",
+      "stance": "Imperialistic oppressor",
+      "goals": "Exploit Eldia's Titan powers; maintain global dominance.",
+      "resources": "Advanced military technology; global alliances."
+    },
+    {
+      "name": "Yeagerists",
+      "stance": "Radical nationalist",
+      "goals": "Support Eren's vision for Eldian supremacy; prioritize Paradis's security.",
+      "resources": "Popular support within Paradis; military assets."
+    }
+  ],
+  "world_setting": "The world of 'Attack on Titan' is a dystopian landscape divided into the island of Paradis and the mainland powers, primarily Marley. Paradis is isolated, with society living within giant walls to protect against Titans. Marley, a technologically advanced empire, exploits Titans for military supremacy. Societies are deeply divided, struggling with ancient prejudices and the looming threat of conflict.",
+  "conflict_structure": "Core conflicts arise from the historical oppression of Eldians by Marleyans, leading to deep-seated animosity. Power dynamics shift with the availability of Titan powers, which both sides seek to control. Internal tensions within Paradis between factions like the Yeagerists and those seeking peace complicate the potential for resolution. Without the Rumbling, dialogue or war becomes the likely path toward resolution.",
+  "historical_context": "The series draws parallels to real-world historical themes of colonialism, ethnic cleansing, and the cyclical nature of hatred and revenge. The Eldians' situation mirrors that of marginalized groups facing systemic oppression and the struggle for autonomy.",
+  "fan_theories": [
+    "Some fans speculate that without the Rumbling, Paradis might advance technologically and diplomatically engage with Marley, leading to a cold war scenario.",
+    "An alternative theory posits that internal civil strife could destabilize Paradis, leading to a revolutionary shift in leadership if Eren's vision is rejected."
+  ],
+  "thematic_elements": [
+    "Freedom vs. Security",
+    "Cycle of Hatred",
+    "Identity and Self-Determination",
+    "Moral Ambiguity"
+  ],
+  "topic_specific_metrics": [
+    {
+      "name": "Diplomatic Resolution Potential",
+      "description": "The likelihood of conflicts being resolved through diplomatic means instead of warfare.",
+      "weight": 0.8
+    },
+    {
+      "name": "Technological Advancement",
+      "description": "The degree to which Paradis and Marley develop new technologies in the absence of the Rumbling.",
+      "weight": 0.6
+    },
+    {
+      "name": "Cultural Integration",
+      "description": "Assessment of how well different cultures and factions might integrate and coexist.",
+      "weight": 0.7
+    }
+  ],
+  "sources": [
+    "Attack on Titan manga/anime canon",
+    "Fan forums and theory discussions",
+    "Historical analyses of colonization and ethnic conflict parallels"
+  ],
+  "created_at": "2026-03-21T10:34:37.224962+00:00"
+}

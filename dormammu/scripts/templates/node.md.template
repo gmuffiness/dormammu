@@ -1,0 +1,26 @@
+# {node_id}: {title}
+
+## Hypothesis
+{현재 노드의 가설 설명 — 최소 2문장}
+
+## Status: EXPANDED|PRUNED | Depth: {N} | Parent: {parent_id}
+
+## Scores
+| CF | FR | EM | DV | PL | FS | Composite |
+|----|----|----|----|----|----|----|
+| {0.00~1.00} | {0.00~1.00} | {0.00~1.00} | {0.00~1.00} | {0.00~1.00} | {0.00~1.00} | {가중합산} |
+
+## Key Events
+1. {이벤트 1 — 캐릭터 행동과 결과}
+2. {이벤트 2}
+3. {이벤트 3}
+{최소 3개, 최대 7개}
+
+## Narrative
+{소설 형식 내러티브 — 최소 2000자}
+{대화, 내면 독백, 감각 묘사 포함}
+{한국어로 작성}
+
+## Children
+- [N0XX](N0XX/node.md) — {title}
+{expanded: 자식 3개 링크 / pruned: "(Pruned)"}

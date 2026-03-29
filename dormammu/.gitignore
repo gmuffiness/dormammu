@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+
+# Environment
+.env
+
+# Data (simulation results are local)
+data/simulations/*.db
+data/simulations/*.db-wal
+data/simulations/*.db-shm
+data/simulations/*.jsonl
+data/simulations/*.md
+data/simulations/*/
+
+# Node
+node_modules/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OMC
+.omc/
+
+# ESE local state (goal, evolution log, reports — not committed)
+.dormammu/
+
+# Claude Code / OpenClaw local state
+claude-progress.txt

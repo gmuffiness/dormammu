@@ -1,0 +1,82 @@
+goal: >
+  Dormammu 시뮬레이션 엔진에 (1) 사전 리서치 단계와 (2) 경로별 연속 내러티브 리플레이 기능을 추가하여,
+  주제에 대한 심층 조사 기반으로 더 현실적이고 풍부한 시뮬레이션을 생성하고,
+  모든 root-to-leaf 경로를 하나의 연속 스토리로 재생할 수 있게 한다.
+
+constraints:
+  - Python 3.10+ (기존 Dormammu 스택 유지)
+  - OpenAI API (gpt-4o) 사용
+  - 기존 DFS 자동 탐색 방식 유지 (인터랙티브 모드 불필요)
+  - 기존 테스트 27개 깨지지 않아야 함
+  - 기존 모듈 경계 준수 (engine/ ↛ orchestrator/, agents/ ↛ orchestrator/)
+  - 리서치 결과는 구조화된 문서로 저장, 시뮬레이션 전반에서 참조
+  - cost_limit 파라미터 기존대로 유지
+
+acceptance_criteria:
+  - 시뮬레이션 시작 전 웹 검색으로 주제 관련 리서치 수행
+  - 리서치 결과가 구조화된 JSON 문서로 data/research/ 하위에 저장
+  - 리서치 문서가 가설 생성, 에이전트 페르소나 생성, 평가 기준에 참조됨
+  - 주제별 동적 평가 지표가 기존 4개 지표에 추가됨
+  - root-to-leaf 경로를 연속 내러티브로 조회하는 API 엔드포인트 존재
+  - 프론트엔드에서 경로 선택 후 연속 타임라인으로 리플레이 가능
+  - pytest tests/ -v 전체 통과
+  - "dormammu run" 실행 시 리서치 → 시뮬레이션 파이프라인 정상 완료
+
+ontology_schema:
+  name: ResearchDrivenSimulation
+  description: 리서치 기반 시뮬레이션 도메인 모델
+  fields:
+    - name: research_document
+      type: object
+      description: >
+        주제에 대한 사전 리서치 결과. 원작 맥락, 팬 분석, 역사/사회학적 배경,
+        핵심 캐릭터/세력, 갈등 구조, 세계관 설정 등 포함
+    - name: research_sources
+      type: array
+      description: 리서치에 사용된 소스 URL/출처 목록
+    - name: topic_specific_metrics
+      type: array
+      description: >
+        주제에서 파생된 동적 평가 지표 (기존 4개 지표에 추가)
+    - name: path_narrative
+      type: object
+      description: >
+        root-to-leaf 경로의 연속 내러티브
+    - name: simulation_context
+      type: object
+      description: >
+        리서치 문서를 기반으로 생성된 시뮬레이션 컨텍스트
+
+evaluation_principles:
+  - name: research_depth
+    description: 리서치가 주제의 원작, 팬 분석, 배경 지식을 충분히 커버하는가
+    weight: 0.25
+  - name: research_integration
+    description: 리서치 결과가 가설/에이전트/평가에 실제로 반영되어 품질이 향상되었는가
+    weight: 0.30
+  - name: dynamic_metrics
+    description: 주제별 동적 지표가 의미있게 생성되고 평가에 활용되는가
+    weight: 0.20
+  - name: path_replay_quality
+    description: 경로별 연속 내러티브가 자연스럽고 일관성 있게 연결되는가
+    weight: 0.25
+
+exit_conditions:
+  - name: all_tests_pass
+    description: 기존 + 신규 테스트 모두 통과
+    criteria: pytest tests/ -v 에서 0 failures
+  - name: research_pipeline_works
+    description: 리서치 → 문서 생성 → 시뮬레이션 참조 파이프라인 정상 동작
+    criteria: dormammu run 실행 시 리서치 문서가 생성되고 참조됨
+  - name: path_replay_works
+    description: API에서 경로별 연속 내러티브 조회 가능
+    criteria: GET /api/simulations/{id}/paths 가 연속 내러티브 반환
+  - name: benchmark_no_regression
+    description: 기존 벤치마크 점수 하락 없음
+    criteria: composite_score >= baseline
+
+metadata:
+  version: "1.0"
+  created_at: "2026-03-21"
+  ambiguity_score: 0.15
+  source: ouroboros-interview

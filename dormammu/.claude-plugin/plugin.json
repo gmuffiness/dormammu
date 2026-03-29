@@ -1,0 +1,14 @@
+{
+  "name": "dormammu",
+  "version": "0.3.0",
+  "description": "What-If Fiction Simulator — DFS scenario tree exploration for alternate timeline stories",
+  "author": {
+    "name": "gmuffiness",
+    "email": "gmuffiness@gmail.com"
+  },
+  "repository": "https://github.com/gmuffiness/dormammu",
+  "homepage": "https://github.com/gmuffiness/dormammu",
+  "license": "MIT",
+  "keywords": ["simulation", "fiction", "what-if", "storytelling", "scenario-tree"],
+  "skills": "./skills/"
+}
