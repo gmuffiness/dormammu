@@ -29,7 +29,7 @@ The key insight: simulation output is *quantitatively measurable*. A score movin
 ```bash
 # Install
 git clone https://github.com/gmuffiness/dormammu.git
-cd emergent-world
+cd dormammu
 pip install -e ".[dev]"
 cp .env.example .env  # Add your OPENAI_API_KEY
 
@@ -39,8 +39,8 @@ dormammu run "What future awaits humanity over the next 100 years?"
 # Run a quick benchmark (fixed params, ~$0.30)
 dormammu run "50 years of humanity's first Mars colony" --max-depth 1 --cost-limit 0.5
 
-# Autonomous improvement loop (5 hours)
-dormammu evolve --hours 5
+# Autonomous improvement loop
+dormammu evolve "50 years of humanity's first Mars colony" --max-iterations 10
 ```
 
 ---
@@ -84,10 +84,12 @@ Each generation, the AI identifies the weakest score, traces it to the responsib
 | `dormammu replay <id>` | Replay a completed simulation at controllable speed |
 | `dormammu list` | List all simulations with scores and status |
 | `dormammu status <id>` | Show simulation state, scores, and cost |
-| `dormammu auto` | 24-hour autonomous simulation loop (generates topics, runs, repeats) |
+| `dormammu auto <topic>` | Autonomous simulation loop (generates topics, runs, repeats) |
 | `dormammu serve` | Start the FastAPI server for the 2D visualization frontend |
+| `dormammu benchmark` | Run a fixed benchmark simulation and print score report |
 | `dormammu diagnose` | Identify the weakest quality dimension and map it to source code |
-| `dormammu evolve --hours N` | Autonomous improvement loop: benchmark → diagnose → improve → repeat |
+| `dormammu improve` | Generate improvement plan from latest benchmark diagnosis |
+| `dormammu evolve <topic>` | Autonomous improvement loop: benchmark → diagnose → improve → repeat |
 
 ---
 

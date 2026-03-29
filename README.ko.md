@@ -29,7 +29,7 @@ Dormammu: *"시뮬레이션이 흥미로운가?"*
 ```bash
 # 설치
 git clone https://github.com/gmuffiness/dormammu.git
-cd emergent-world
+cd dormammu
 pip install -e ".[dev]"
 cp .env.example .env  # OPENAI_API_KEY 추가
 
@@ -39,8 +39,8 @@ dormammu run "앞으로 100년, 인류에게는 어떤 미래가 올 것인가?"
 # 빠른 벤치마크 (~$0.30)
 dormammu run "인류 최초의 화성 식민지 50년" --max-depth 1 --cost-limit 0.5
 
-# 자율 개선 루프 (5시간)
-dormammu evolve --hours 5
+# 자율 개선 루프
+dormammu evolve "인류 최초의 화성 식민지 50년" --max-iterations 10
 ```
 
 ---
@@ -84,10 +84,12 @@ dormammu evolve --hours 5
 | `dormammu replay <id>` | 완료된 시뮬레이션을 속도 조절하며 재생 |
 | `dormammu list` | 모든 시뮬레이션 목록 (점수, 상태) |
 | `dormammu status <id>` | 시뮬레이션 상태, 점수, 비용 표시 |
-| `dormammu auto` | 24시간 자율 시뮬레이션 루프 |
+| `dormammu auto <주제>` | 자율 시뮬레이션 루프 |
 | `dormammu serve` | 2D 시각화 프론트엔드용 FastAPI 서버 시작 |
+| `dormammu benchmark` | 고정 벤치마크 시뮬레이션 실행 및 점수 리포트 |
 | `dormammu diagnose` | 가장 약한 품질 차원을 찾아 소스 코드에 매핑 |
-| `dormammu evolve --hours N` | 자율 개선 루프: benchmark → diagnose → improve → 반복 |
+| `dormammu improve` | 최신 벤치마크 진단에서 개선 계획 생성 |
+| `dormammu evolve <주제>` | 자율 개선 루프: benchmark → diagnose → improve → 반복 |
 
 ---
 
